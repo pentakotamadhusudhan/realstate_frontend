@@ -1,13 +1,20 @@
-import PlotMap from "@/components/PlotMap";
-import PlotDetailsDrawer from "@/components/PlotDetailsDrawer";
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
+import { usePlotStore } from './store/plotStore';
 
-function App() {
+export default function App() {
+  const { isDarkMode } = usePlotStore();
+
   return (
-    <div className="h-screen relative">
-      <PlotMap />
-      <PlotDetailsDrawer />
+    <div
+      className="flex flex-col"
+      style={{
+        height: '100dvh',
+        background: isDarkMode ? '#0a1628' : '#f8fafc',
+      }}
+    >
+      <Navbar />
+      <Dashboard />
     </div>
   );
 }
-
-export default App;
