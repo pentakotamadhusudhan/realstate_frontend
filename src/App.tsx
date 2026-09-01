@@ -1,20 +1,26 @@
-import Navbar from './components/Navbar';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegistrationPage'; // Import your new page here
+import './App.css';
 import Dashboard from './pages/Dashboard';
-import { usePlotStore } from './store/plotStore';
 
-export default function App() {
-  const { isDarkMode } = usePlotStore();
-
+function App() {
   return (
-    <div
-      className="flex flex-col"
-      style={{
-        height: '100dvh',
-        background: isDarkMode ? '#0a1628' : '#f8fafc',
-      }}
-    >
-      <Navbar />
-      <Dashboard />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Redirect root path straight to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Dedicated Route for Logging In */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Dedicated Route for Customer Registration */}
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
