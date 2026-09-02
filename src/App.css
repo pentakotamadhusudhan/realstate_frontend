@@ -545,3 +545,16 @@
   color: #64748b;
   font-size: 0.85rem;
 }
+
+
+
+/* Navbar scroll fix */
+header {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* Hide scrollbar but keep functionality */
+header::-webkit-scrollbar {
+  display: none;
+}

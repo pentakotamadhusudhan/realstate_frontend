@@ -1,4 +1,6 @@
-export type PlotStatus = 'available' | 'reserved' | 'sold';
+// Django sends: AVAILABLE, HELD, SOLD, BLOCKED
+// Frontend uses: available, reserved, sold
+export type PlotStatus = 'available' | 'reserved' | 'sold' | 'held' | 'blocked';
 
 export type PlotCategory = 'residential' | 'commercial' | 'park' | 'road' | 'amenity';
 
@@ -14,11 +16,13 @@ export interface Plot {
   areaSqft: number;
   price: number;
   status: PlotStatus;
-  category: PlotCategory;
+  category?: PlotCategory;
   coordinates: LatLng[];
   description?: string;
   facing?: string;
-  corner?: boolean;
+  dimensions?: string;
+  corner_plot?: boolean;
+  notes?: string;
   images?: string[];
 }
 

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import hook
 import { LoginForm } from '../components/LoginForms';
+import { ENDPOINTS, saveTokens } from '../lib/api'
+
 
 interface AuthApiResponse {
     user: {
@@ -29,8 +31,7 @@ export const LoginPage: React.FC = () => {
     const handleAuthSubmit = async (credentials: { email: string; password: string }) => {
         setIsSubmitting(true);
         setErrorMessage('');
-
-        const endpoint = 'http://192.168.0.5:8000/api/auth/login/';
+        const endpoint = ENDPOINTS.login
 
         const loginPayload = {
             identifier: credentials.email,
@@ -55,8 +56,7 @@ export const LoginPage: React.FC = () => {
 
             const verifiedData = data as AuthApiResponse;
 
-            localStorage.setItem('access_token', verifiedData.tokens.access);
-            localStorage.setItem('refresh_token', verifiedData.tokens.refresh);
+            saveTokens(verifiedData.tokens.access, verifiedData.tokens.refresh)
             localStorage.setItem('user_profile', JSON.stringify(verifiedData.user));
 
             alert(`Welcome back, ${verifiedData.user.full_name}! Let’s find your next home.`);

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { RegisterForm, type RegisterPayload } from '../components/registrationForms';
+import { useNavigate } from 'react-router-dom';
+import { RegisterForm, type RegisterPayload } from '../components/RegistrationForms';
+import { ENDPOINTS, saveTokens } from '../lib/api';
 
-// Interfaces modeled strictly against your API response layout
 interface ApiResponse {
     user: {
         id: string;
@@ -23,6 +24,7 @@ export const RegisterPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState('');
     const [successData, setSuccessData] = useState<ApiResponse | null>(null);
+    const navigate = useNavigate();
 
     const handleRegisterSubmit = async (payload: RegisterPayload) => {
         setIsSubmitting(true);
@@ -30,33 +32,25 @@ export const RegisterPage: React.FC = () => {
         setSuccessData(null);
 
         try {
-            const response = await fetch('http://192.168.0.5:8000/api/auth/register/customer/', {
+            const response = await fetch(ENDPOINTS.register, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                // Fallback checks for structured Django REST framework validation errors
                 throw new Error(data.message || JSON.stringify(data) || 'Something went wrong during registration.');
             }
 
             const verifiedData = data as ApiResponse;
             setSuccessData(verifiedData);
-
-            // Store session metadata inside localStorage
-            localStorage.setItem('access_token', verifiedData.tokens.access);
-            localStorage.setItem('refresh_token', verifiedData.tokens.refresh);
+            saveTokens(verifiedData.tokens.access, verifiedData.tokens.refresh);
             localStorage.setItem('user_profile', JSON.stringify(verifiedData.user));
 
             alert(`Registration Successful! Welcome ${verifiedData.user.full_name}`);
-
-            // Real application redirection path would execute here:
-            // navigate('/dashboard');
+            navigate('/dashboard');
 
         } catch (error: any) {
             console.error('Registration API Error:', error);
@@ -68,14 +62,12 @@ export const RegisterPage: React.FC = () => {
 
     return (
         <div className="estate-login-split-page">
-            {/* Visual Design Showcase Panel */}
             <div className="showcase-side">
                 <div className="showcase-overlay" />
                 <div className="showcase-content">
                     <div className="trending-badge">✦ Over 10,000+ Premium Properties Available</div>
                     <h2>Find a Place Where Your Story Begins.</h2>
                     <p>Gain premium access to off-market listings, virtual home tours, and real-time market updates perfectly tailored to your budget.</p>
-
                     <div className="mini-stats">
                         <div>
                             <span className="stat-num">24 Hours</span>
@@ -89,7 +81,6 @@ export const RegisterPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Interactive API Action Form Panel */}
             <div className="form-side">
                 {apiError && <div className="toast-error-banner">{apiError}</div>}
 
@@ -108,7 +99,6 @@ export const RegisterPage: React.FC = () => {
                                 Already have an account?{' '}
                                 <a href="/login" className="forgot-link">Sign in here</a>
                             </p>
-
                         </div>
                     </>
                 )}
