@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, ENDPOINTS } from '../../lib/api'
 import LocationPicker from './LocationPicker'
+import VentureList from './VentureList'
 
 export default function VentureCreate() {
     const navigate = useNavigate()

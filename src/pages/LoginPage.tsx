@@ -62,7 +62,8 @@ export const LoginPage: React.FC = () => {
             alert(`Welcome back, ${verifiedData.user.full_name}! Let’s find your next home.`);
 
             // ✅ Using the instantiated navigate function here is now safe
-            navigate('/dashboard');
+            // navigate('/dashboard');
+            navigate('/ventures')
 
         } catch (error: any) {
             console.error('Auth API Error:', error);

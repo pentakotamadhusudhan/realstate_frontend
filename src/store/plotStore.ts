@@ -88,12 +88,19 @@ export const usePlotStore = create<PlotStore>((set, get) => ({
   isLoading: false,
   error: null,
 
-  // Fetch plots from Django API
   fetchPlots: async () => {
     set({ isLoading: true, error: null })
     try {
-      const data = await apiFetch(ENDPOINTS.plots)
-      // Django returns paginated response: { results: [...] }
+      const stored = sessionStorage.getItem('customer_venture')
+      const venture = stored ? JSON.parse(stored) : null
+
+      const url = venture
+        ? `${ENDPOINTS.plots}?venture=${venture.id}`
+        : ENDPOINTS.plots
+
+      console.log('plots url', url)
+
+      const data = await apiFetch(url)
       const raw = data.results ?? data
       const plots = raw.map(mapApiPlot)
       set({

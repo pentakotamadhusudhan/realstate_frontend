@@ -7,4 +7,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      // Forces Vite to resolve the import to the raw path directly 
+      'leaflet-draw': 'leaflet-draw/dist/leaflet.draw.js'
+    }
+  }
 })

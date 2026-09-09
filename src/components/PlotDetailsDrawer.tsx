@@ -1,6 +1,9 @@
 import { X, MapPin, Maximize2, IndianRupee, Tag, SquareSquare, Compass, Phone, MessageSquare, Star } from 'lucide-react';
 import { usePlotStore } from '../store/plotStore';
 import type { Plot } from '../types/plot';
+import { apiFetch } from '../lib/api'
+import { useState } from 'react'
+
 
 function formatPrice(price: number): string {
   if (price >= 10000000) return `₹${(price / 10000000).toFixed(2)} Cr`;
@@ -57,6 +60,26 @@ function StatCard({ icon, label, value }: StatCardProps) {
 
 export default function PlotDetailsDrawer() {
   const { selectedPlot, selectPlot } = usePlotStore();
+  // Inside the component add:
+  const [holding, setHolding] = useState(false)
+  const [holdSuccess, setHoldSuccess] = useState(false)
+  const [holdError, setHoldError] = useState('')
+
+  async function handleHold() {
+    setHolding(true)
+    setHoldError('')
+    try {
+      await apiFetch('http://192.168.1.10:8000/api/holds/', {
+        method: 'POST',
+        body: JSON.stringify({ plot_id: plot.id }),
+      })
+      setHoldSuccess(true)
+    } catch (err: any) {
+      setHoldError(err?.detail || 'Failed to place hold. Try again.')
+    } finally {
+      setHolding(false)
+    }
+  }
 
   if (!selectedPlot) return null;
 
@@ -234,7 +257,7 @@ export default function PlotDetailsDrawer() {
 
       {/* CTA Buttons */}
       <div className="px-3 pb-4 mt-auto flex flex-col gap-2">
-        {plot.status === 'available' && (
+        {/* {plot.status === 'available' && (
           <button
             className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
             style={{
@@ -243,6 +266,31 @@ export default function PlotDetailsDrawer() {
           >
             Book This Plot
           </button>
+        )} */}
+
+        {plot.status === 'available' && (
+          <>
+            {holdSuccess ? (
+              <div
+                className="w-full py-2.5 rounded-xl text-sm font-semibold text-center"
+                style={{ background: '#dcfce7', color: '#166534' }}
+              >
+                ✅ Plot held! Our team will contact you soon.
+              </div>
+            ) : (
+              <button
+                onClick={handleHold}
+                disabled={holding}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg, #0f2040, #2563eb)' }}
+              >
+                {holding ? 'Placing Hold...' : 'Book This Plot'}
+              </button>
+            )}
+            {holdError && (
+              <p className="text-xs text-red-500 text-center mt-1">{holdError}</p>
+            )}
+          </>
         )}
         <div className="grid grid-cols-2 gap-2">
           <button
