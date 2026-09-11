@@ -12,14 +12,18 @@ function formatPrice(price: number): string {
   return `₹${price.toLocaleString('en-IN')}`;
 }
 
-const STATUS_STYLE = {
+const STATUS_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
   available: { bg: '#dcfce7', color: '#166534', dot: '#16a34a' },
   reserved: { bg: '#fef9c3', color: '#854d0e', dot: '#ca8a04' },
+  held: { bg: '#fef9c3', color: '#854d0e', dot: '#ca8a04' },
   sold: { bg: '#fee2e2', color: '#991b1b', dot: '#dc2626' },
-};
+  blocked: { bg: '#f1f5f9', color: '#475569', dot: '#94a3b8' },
+}
+
+const DEFAULT_STATUS_STYLE = { bg: '#f1f5f9', color: '#475569', dot: '#94a3b8' }
 
 export default function PlotTooltip({ plot, x, y }: PlotTooltipProps) {
-  const statusStyle = STATUS_STYLE[plot.status];
+  const statusStyle = STATUS_STYLE[plot.status] ?? DEFAULT_STATUS_STYLE
   const tooltipWidth = 200;
   const tooltipHeight = 140;
 
@@ -52,9 +56,11 @@ export default function PlotTooltip({ plot, x, y }: PlotTooltipProps) {
             background:
               plot.status === 'available'
                 ? 'linear-gradient(90deg, #10b981, #34d399)'
-                : plot.status === 'reserved'
-                ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
-                : 'linear-gradient(90deg, #ef4444, #f87171)',
+                : plot.status === 'reserved' || plot.status === 'held'
+                  ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
+                  : plot.status === 'sold'
+                    ? 'linear-gradient(90deg, #ef4444, #f87171)'
+                    : 'linear-gradient(90deg, #94a3b8, #cbd5e1)',
           }}
         />
 
