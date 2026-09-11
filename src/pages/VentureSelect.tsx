@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, ENDPOINTS } from '../lib/api'
-import { MapPin, Home, ChevronRight, User, Info, Building2, ChevronLeft } from 'lucide-react'
+import { MapPin, Home, ChevronRight, User, Info, Building2, ChevronLeft, Building2Icon, Clock } from 'lucide-react'
 
 interface Venture {
     id: string
@@ -144,16 +144,18 @@ export default function VentureSelect() {
                 {/* Center — Nav links */}
                 <nav className="hidden md:flex items-center gap-1">
                     {[
-                        { label: 'Home', icon: <Home size={13} /> },
-                        { label: 'Ventures', icon: <Building2 size={13} /> },
-                        { label: 'About Us', icon: <Info size={13} /> },
-                    ].map((item, i) => (
+                        { label: 'Home', icon: <Home size={13} />, path: '/ventures' },
+                        { label: 'Ventures', icon: <Building2 size={13} />, path: '/ventures' },
+                        { label: 'My Holds', icon: <Clock size={13} />, path: '/my-holds' },
+                        { label: 'About Us', icon: <Info size={13} />, path: null },
+                    ].map((item) => (
                         <button
                             key={item.label}
+                            onClick={() => item.path && navigate(item.path)}
                             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition"
                             style={{
-                                color: i === 1 ? 'white' : 'rgba(255,255,255,0.6)',
-                                background: i === 1 ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                color: item.path === window.location.pathname ? 'white' : 'rgba(255,255,255,0.6)',
+                                background: item.path === window.location.pathname ? 'rgba(255,255,255,0.1)' : 'transparent',
                             }}
                         >
                             {item.icon}

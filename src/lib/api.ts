@@ -7,6 +7,7 @@ export const ENDPOINTS = {
     ventures: `${API_BASE_URL}/ventures/`,
     plots: `${API_BASE_URL}/plots/`,
     tokenRefresh: `${API_BASE_URL}/auth/token/refresh/`,
+    myHolds: `${API_BASE_URL}/holds/mine/`,
 }
 
 export function saveTokens(access: string, refresh: string) {
