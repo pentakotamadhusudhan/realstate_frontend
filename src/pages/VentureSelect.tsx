@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, ENDPOINTS } from '../lib/api'
 import { MapPin, Home, ChevronRight, User, Info, Building2, ChevronLeft, Building2Icon, Clock } from 'lucide-react'
+import LoadingScreen from '../components/LoadingComponent'
+import logo from "../assets/logomain.png";
 
 interface Venture {
     id: string
@@ -121,13 +123,17 @@ export default function VentureSelect() {
                 }}
             >
                 {/* Left — Logo + Name */}
-                <div className="flex items-center gap-3">
-                    <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 12px rgba(245,158,11,0.4)' }}
-                    >
-                        <MapPin size={18} color="white" strokeWidth={2.5} />
+                <div className="flex items-center gap-1">
+
+                    {/* Center logo */}
+                    <div className="w-16 h-16  items-center justify-center bg-white rounded-full animate-pulse">
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            className="w-full h-full object-contain animate-pulse rounded-full"
+                        />
                     </div>
+
                     <div>
                         <span
                             className="font-bold text-white text-lg block leading-none"
@@ -271,12 +277,7 @@ export default function VentureSelect() {
                 </div>
 
                 {loading && (
-                    <div className="flex items-center justify-center py-20">
-                        <div className="text-center">
-                            <div className="text-4xl mb-3">⚙️</div>
-                            <p className="text-gray-400">Loading ventures...</p>
-                        </div>
-                    </div>
+                    <LoadingScreen />
                 )}
 
                 {error && (
@@ -285,104 +286,175 @@ export default function VentureSelect() {
                     </div>
                 )}
 
+                ```jsx
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {ventures.map(venture => (
+
+                    {ventures.map((venture) => (
+
                         <div
                             key={venture.id}
                             onClick={() => handleSelect(venture)}
                             className="group cursor-pointer rounded-2xl overflow-hidden border transition-all duration-200"
                             style={{
-                                background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-                                borderColor: 'rgba(255,255,255,0.08)',
+                                background: '#ffffff',
+                                borderColor: '#e5e7eb',
                             }}
-                            onMouseEnter={e => (e.currentTarget.style.borderColor = '#3b82f6')}
-                            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.borderColor = '#3b82f6')
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.borderColor = '#e5e7eb')
+                            }
                         >
+
                             {/* Top color bar */}
                             <div
                                 className="h-1.5 w-full"
-                                style={{ background: 'linear-gradient(90deg, #2563eb, #7c3aed)' }}
+                                style={{
+                                    background: 'linear-gradient(90deg, #2563eb, #7c3aed)',
+                                }}
                             />
 
                             <div className="p-6">
+
                                 {/* Status + plots count */}
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className={`text-xs font-semibold px-3 py-1 rounded-full ${venture.status === 'PUBLISHED'
-                                        ? 'bg-green-900/50 text-green-400'
-                                        : 'bg-yellow-900/50 text-yellow-400'
-                                        }`}>
+
+                                    <span
+                                        className={`text-xs font-semibold px-3 py-1 rounded-full ${venture.status === 'PUBLISHED'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-yellow-100 text-yellow-700'
+                                            }`}
+                                    >
                                         {venture.status}
                                     </span>
-                                    <div className="flex items-center gap-1 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+
+                                    <div
+                                        className="flex items-center gap-1 text-xs"
+                                        style={{ color: '#6b7280' }}
+                                    >
                                         <Home size={11} />
                                         {venture.total_plots} total plots
                                     </div>
+
                                 </div>
 
                                 {/* Name and location */}
-                                <h2 className="text-lg font-bold text-white mb-1 group-hover:text-blue-400 transition">
+                                <h2 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">
                                     {venture.name}
                                 </h2>
-                                <div className="flex items-center gap-1.5 text-sm mb-5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+
+                                <div
+                                    className="flex items-center gap-1.5 text-sm mb-5"
+                                    style={{ color: '#6b7280' }}
+                                >
                                     <MapPin size={12} />
                                     {venture.city}, {venture.state}
                                 </div>
 
                                 {/* Stats */}
                                 <div className="grid grid-cols-2 gap-3 mb-5">
+
+                                    {/* Available */}
                                     <div
                                         className="rounded-xl p-3 text-center"
-                                        style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}
+                                        style={{
+                                            background: 'rgba(16, 185, 129, 0.08)',
+                                            border: '1px solid rgba(16, 185, 129, 0.2)',
+                                        }}
                                     >
-                                        <p className="text-2xl font-bold text-emerald-400">{venture.available_plots}</p>
-                                        <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>Available</p>
+                                        <p className="text-2xl font-bold text-emerald-600">
+                                            {venture.available_plots}
+                                        </p>
+
+                                        <p
+                                            className="text-xs mt-0.5"
+                                            style={{ color: '#6b7280' }}
+                                        >
+                                            Available
+                                        </p>
                                     </div>
+
+                                    {/* Booked */}
                                     <div
                                         className="rounded-xl p-3 text-center"
-                                        style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}
+                                        style={{
+                                            background: 'rgba(239, 68, 68, 0.08)',
+                                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                                        }}
                                     >
-                                        <p className="text-2xl font-bold text-red-400">
+                                        <p className="text-2xl font-bold text-red-500">
                                             {venture.total_plots - venture.available_plots}
                                         </p>
-                                        <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>Booked</p>
+
+                                        <p
+                                            className="text-xs mt-0.5"
+                                            style={{ color: '#6b7280' }}
+                                        >
+                                            Booked
+                                        </p>
                                     </div>
+
                                 </div>
 
                                 {/* Amenities */}
                                 {venture.amenities && venture.amenities.length > 0 && (
+
                                     <div className="flex flex-wrap gap-1.5 mb-5">
+
                                         {venture.amenities.slice(0, 4).map((a: string) => (
+
                                             <span
                                                 key={a}
                                                 className="text-xs px-2 py-0.5 rounded-full"
-                                                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+                                                style={{
+                                                    background: '#f3f4f6',
+                                                    color: '#4b5563',
+                                                }}
                                             >
                                                 {a}
                                             </span>
+
                                         ))}
+
                                         {venture.amenities.length > 4 && (
+
                                             <span
                                                 className="text-xs px-2 py-0.5 rounded-full"
-                                                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+                                                style={{
+                                                    background: '#f3f4f6',
+                                                    color: '#4b5563',
+                                                }}
                                             >
                                                 +{venture.amenities.length - 4} more
                                             </span>
+
                                         )}
+
                                     </div>
+
                                 )}
 
                                 {/* CTA */}
                                 <button
                                     className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition"
-                                    style={{ background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', color: 'white' }}
+                                    style={{
+                                        background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+                                        color: '#ffffff',
+                                    }}
                                 >
                                     Explore Plots
                                     <ChevronRight size={15} />
                                 </button>
+
                             </div>
+
                         </div>
+
                     ))}
+
                 </div>
+
 
                 {/* Footer */}
                 <div className="mt-12 text-center pb-6">

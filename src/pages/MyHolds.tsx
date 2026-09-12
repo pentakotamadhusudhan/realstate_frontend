@@ -27,17 +27,15 @@ interface Hold {
 function formatPrice(price: string): string {
     const p = parseFloat(price)
     if (p >= 10000000) return `₹${(p / 10000000).toFixed(2)} Cr`
-    if (p >= 100000) return `₹${(p / 100000).toFixed(1)} Lakhs`
+    if (p >= 100000) return `₹${(p / 100000).toFixed(1)} L`
     return `₹${p.toLocaleString('en-IN')}`
 }
 
 function formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString('en-IN', {
         day: 'numeric',
-        month: 'short',
+        month: 'numeric',
         year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
     })
 }
 
@@ -52,41 +50,14 @@ function timeRemaining(expiresAt: string): string {
 
 interface StatusConfig {
     label: string
-    bg: string
-    color: string
-    border: string
     icon: React.ReactElement
 }
 
 const STATUS_CONFIG: Record<string, StatusConfig> = {
-    ACTIVE: {
-        label: 'Active',
-        bg: '#dcfce7',
-        color: '#166534',
-        border: '#bbf7d0',
-        icon: <CheckCircle size={13} />,
-    },
-    EXPIRED: {
-        label: 'Expired',
-        bg: '#fee2e2',
-        color: '#991b1b',
-        border: '#fecaca',
-        icon: <XCircle size={13} />,
-    },
-    CANCELLED: {
-        label: 'Cancelled',
-        bg: '#f1f5f9',
-        color: '#475569',
-        border: '#e2e8f0',
-        icon: <XCircle size={13} />,
-    },
-    CONVERTED: {
-        label: 'Sold',
-        bg: '#eff6ff',
-        color: '#1d4ed8',
-        border: '#bfdbfe',
-        icon: <CheckCircle size={13} />,
-    },
+    ACTIVE: { label: 'Active', icon: <CheckCircle size={13} /> },
+    EXPIRED: { label: 'Expired', icon: <XCircle size={13} /> },
+    CANCELLED: { label: 'Cancelled', icon: <XCircle size={13} /> },
+    CONVERTED: { label: 'Converted', icon: <CheckCircle size={13} /> },
 }
 
 function HoldCard({
@@ -100,7 +71,6 @@ function HoldCard({
     cancellingId: string | null
     onCall: () => void
 }) {
-    const cfg = STATUS_CONFIG[hold.status] ?? STATUS_CONFIG.CANCELLED
     const isActive = hold.status === 'ACTIVE'
 
     return (
@@ -108,106 +78,107 @@ function HoldCard({
             className="rounded-2xl overflow-hidden"
             style={{
                 background: 'white',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
+                maxWidth: 640,
             }}
         >
+            {/* Top accent bar */}
             <div
-                className="h-1 w-full"
+                className="h-1.5 w-full"
                 style={{
-                    background: isActive
-                        ? 'linear-gradient(90deg, #10b981, #059669)'
-                        : 'linear-gradient(90deg, #94a3b8, #cbd5e1)',
+                    background: isActive ? '#10b981' : '#d1d5db',
                 }}
             />
 
             <div className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                    <div>
-                        <h3 className="font-bold text-lg" style={{ color: '#0f172a' }}>
-                            Plot {hold.plot_detail?.plot_number || 'N/A'}
-                        </h3>
-                        <p className="text-sm" style={{ color: '#64748b' }}>
-                            Hold ID: {hold.id.slice(0, 8)}...
-                        </p>
-                    </div>
-                    <span
-                        className="flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full"
-                        style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}
-                    >
-                        {cfg.icon}
-                        {cfg.label}
-                    </span>
+                {/* Header */}
+                <div className="flex items-start justify-between mb-1">
+                    <h3 className="font-bold text-xl" style={{ color: '#111827' }}>
+                        Plot {hold.plot_detail?.plot_number || 'N/A'}
+                    </h3>
+                    {hold.plot_detail?.total_price && (
+                        <span className="font-bold text-base" style={{ color: '#111827' }}>
+                            {formatPrice(hold.plot_detail.total_price)}
+                        </span>
+                    )}
                 </div>
 
+                {/* Subtitle */}
+                <p className="text-sm mb-4" style={{ color: '#6b7280' }}>
+                    HLD-{hold.id.slice(0, 5).toUpperCase()}
+                </p>
+
+                {/* Stats grid */}
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="rounded-xl p-3" style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                        <p className="text-xs mb-1" style={{ color: '#94a3b8' }}>Area</p>
-                        <p className="font-semibold text-sm" style={{ color: '#0f172a' }}>
+                    <div className="rounded-xl p-3" style={{ background: '#f9fafb' }}>
+                        <p className="text-xs mb-1" style={{ color: '#9ca3af' }}>Area</p>
+                        <p className="font-semibold text-sm" style={{ color: '#111827' }}>
                             {hold.plot_detail?.area_sqft
                                 ? `${parseFloat(hold.plot_detail.area_sqft).toLocaleString()} sqft`
                                 : 'N/A'}
                         </p>
                     </div>
-                    <div className="rounded-xl p-3" style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                        <p className="text-xs mb-1" style={{ color: '#94a3b8' }}>Total Price</p>
-                        <p className="font-semibold text-sm" style={{ color: '#0f172a' }}>
-                            {hold.plot_detail?.total_price
-                                ? formatPrice(hold.plot_detail.total_price)
-                                : 'N/A'}
+                    <div className="rounded-xl p-3" style={{ background: '#f9fafb' }}>
+                        <p className="text-xs mb-1" style={{ color: '#9ca3af' }}>Held on</p>
+                        <p className="font-semibold text-sm" style={{ color: '#111827' }}>
+                            {formatDate(hold.held_at)}
                         </p>
                     </div>
                 </div>
 
-                <div
-                    className="rounded-xl p-3 mb-4 flex items-center gap-3"
-                    style={{
-                        background: isActive ? '#f0fdf4' : '#f8fafc',
-                        border: `1px solid ${isActive ? '#bbf7d0' : '#e2e8f0'}`,
-                    }}
-                >
-                    <Clock size={16} color={isActive ? '#16a34a' : '#94a3b8'} />
-                    <div>
-                        <p className="text-xs font-semibold" style={{ color: isActive ? '#166534' : '#475569' }}>
-                            {isActive ? timeRemaining(hold.expires_at) : STATUS_CONFIG[hold.status]?.label}
-                        </p>
-                        <p className="text-xs mt-0.5" style={{ color: '#94a3b8' }}>
-                            Held on {formatDate(hold.held_at)}
-                        </p>
-                        {isActive && (
-                            <p className="text-xs" style={{ color: '#94a3b8' }}>
-                                Expires {formatDate(hold.expires_at)}
-                            </p>
-                        )}
+                {/* Time remaining */}
+                {isActive && (
+                    <div className="flex items-center gap-2 mb-5">
+                        <Clock size={15} color="#10b981" />
+                        <span className="text-sm font-medium" style={{ color: '#10b981' }}>
+                            {timeRemaining(hold.expires_at)}
+                        </span>
                     </div>
-                </div>
+                )}
+
+                {!isActive && (
+                    <div className="flex items-center gap-2 mb-5">
+                        <XCircle size={15} color="#9ca3af" />
+                        <span className="text-sm font-medium" style={{ color: '#9ca3af' }}>
+                            {STATUS_CONFIG[hold.status]?.label}
+                        </span>
+                    </div>
+                )}
 
                 {hold.notes && (
-                    <p className="text-xs mb-4 px-1" style={{ color: '#64748b' }}>
+                    <p className="text-xs mb-4" style={{ color: '#6b7280' }}>
                         📝 {hold.notes}
                     </p>
                 )}
 
-                <div className="flex gap-2">
-                    <button
-                        onClick={onCall}
-                        className="flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition hover:opacity-80"
-                        style={{ background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0' }}
-                    >
-                        <Phone size={11} />
-                        Call Agent
-                    </button>
+                {/* Action buttons */}
+                <div className="flex gap-3">
                     {isActive && (
                         <button
                             onClick={() => onCancel(hold.id)}
                             disabled={cancellingId === hold.id}
-                            className="flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition hover:opacity-80 disabled:opacity-60"
-                            style={{ background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca' }}
+                            className="flex-1 py-3 rounded-xl text-sm font-semibold transition hover:opacity-90 disabled:opacity-60"
+                            style={{
+                                background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                                color: 'white',
+                                border: 'none',
+                            }}
                         >
-                            <XCircle size={11} />
                             {cancellingId === hold.id ? 'Cancelling...' : 'Cancel Hold'}
                         </button>
                     )}
+                    <button
+                        onClick={onCall}
+                        className="flex-1 py-3 rounded-xl text-sm font-semibold transition hover:opacity-80"
+                        style={{
+                            background: 'white',
+                            color: '#374151',
+                            border: '1px solid #e5e7eb',
+                        }}
+                    >
+                        Call Agent
+                    </button>
                 </div>
             </div>
         </div>
@@ -256,8 +227,26 @@ export default function MyHolds() {
     const activeHolds = holds.filter(h => h.status === 'ACTIVE')
     const pastHolds = holds.filter(h => h.status !== 'ACTIVE')
 
+    const statCards = [
+        {
+            label: 'Active Holds',
+            count: activeHolds.length,
+            bg: 'linear-gradient(135deg, #10b981, #059669)',
+        },
+        {
+            label: 'Total Holds',
+            count: holds.length,
+            bg: 'linear-gradient(135deg, #0f2040, #1e3a6e)',
+        },
+        {
+            label: 'Converted',
+            count: holds.filter(h => h.status === 'CONVERTED').length,
+            bg: 'linear-gradient(135deg, #f97316, #ea580c)',
+        },
+    ]
+
     return (
-        <div className="min-h-screen flex flex-col" style={{ background: '#f8fafc' }}>
+        <div className="min-h-screen flex flex-col" style={{ background: '#f9fafb' }}>
 
             {/* Header */}
             <header
@@ -265,7 +254,6 @@ export default function MyHolds() {
                 style={{
                     background: 'linear-gradient(135deg, #0f2040 0%, #1a2f5e 100%)',
                     borderBottom: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 2px 20px rgba(0,0,0,0.3)',
                 }}
             >
                 <div className="flex items-center gap-3">
@@ -275,23 +263,15 @@ export default function MyHolds() {
                     >
                         <MapPin size={18} color="white" strokeWidth={2.5} />
                     </div>
-                    <div>
-                        <span
-                            className="font-bold text-white text-lg block leading-none"
-                            style={{ letterSpacing: '-0.03em' }}
-                        >
-                            PlotVista
-                        </span>
-                        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                            My Holdings
-                        </span>
-                    </div>
+                    <span className="font-bold text-white text-lg" style={{ letterSpacing: '-0.03em' }}>
+                        PlotVista
+                    </span>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => navigate('/ventures')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition hover:opacity-80 text-white"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition hover:opacity-80"
                         style={{ background: 'rgba(255,255,255,0.08)' }}
                     >
                         <ArrowLeft size={12} />
@@ -308,30 +288,23 @@ export default function MyHolds() {
             </header>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-8 max-w-3xl mx-auto w-full">
+            <div className="flex-1 overflow-y-auto px-6 py-10 max-w-3xl mx-auto w-full">
 
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold mb-1" style={{ color: '#0f172a' }}>
-                        My Holdings
-                    </h1>
-                    <p className="text-sm" style={{ color: '#64748b' }}>
-                        Welcome, {user.full_name || 'User'} — here are your plot bookings
-                    </p>
-                </div>
+                {/* Page title */}
+                <h1 className="text-3xl font-bold mb-8" style={{ color: '#111827' }}>
+                    My holdings
+                </h1>
 
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                    {[
-                        { label: 'Active Holds', count: activeHolds.length, color: '#16a34a', bg: '#dcfce7', border: '#bbf7d0' },
-                        { label: 'Total Holds', count: holds.length, color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' },
-                        { label: 'Converted', count: holds.filter(h => h.status === 'CONVERTED').length, color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe' },
-                    ].map(stat => (
+                {/* Stats row */}
+                <div className="grid grid-cols-3 gap-4 mb-10">
+                    {statCards.map(stat => (
                         <div
                             key={stat.label}
-                            className="rounded-2xl p-4 text-center"
-                            style={{ background: stat.bg, border: `1px solid ${stat.border}` }}
+                            className="rounded-2xl p-5"
+                            style={{ background: stat.bg }}
                         >
-                            <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.count}</p>
-                            <p className="text-xs font-medium mt-1" style={{ color: stat.color }}>{stat.label}</p>
+                            <p className="text-3xl font-bold text-white">{stat.count}</p>
+                            <p className="text-sm text-white mt-1 opacity-90">{stat.label}</p>
                         </div>
                     ))}
                 </div>
@@ -340,7 +313,7 @@ export default function MyHolds() {
                     <div className="flex items-center justify-center py-20">
                         <div className="text-center">
                             <div className="text-4xl mb-3">⚙️</div>
-                            <p style={{ color: '#64748b' }}>Loading your holdings...</p>
+                            <p style={{ color: '#6b7280' }}>Loading your holdings...</p>
                         </div>
                     </div>
                 )}
@@ -355,8 +328,8 @@ export default function MyHolds() {
                 {!loading && holds.length === 0 && (
                     <div className="text-center py-20">
                         <div className="text-6xl mb-4">🏡</div>
-                        <h3 className="text-lg font-bold mb-2" style={{ color: '#0f172a' }}>No holdings yet</h3>
-                        <p className="text-sm mb-6" style={{ color: '#64748b' }}>
+                        <h3 className="text-lg font-bold mb-2" style={{ color: '#111827' }}>No holdings yet</h3>
+                        <p className="text-sm mb-6" style={{ color: '#6b7280' }}>
                             Browse ventures and book your dream plot
                         </p>
                         <button
@@ -369,11 +342,11 @@ export default function MyHolds() {
                     </div>
                 )}
 
+                {/* Active holdings */}
                 {activeHolds.length > 0 && (
-                    <div className="mb-8">
-                        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: '#0f172a' }}>
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                            Active Holdings ({activeHolds.length})
+                    <div className="mb-10">
+                        <h2 className="text-lg font-bold mb-4" style={{ color: '#111827' }}>
+                            Active holdings
                         </h2>
                         <div className="flex flex-col gap-4">
                             {activeHolds.map(hold => (
@@ -389,11 +362,11 @@ export default function MyHolds() {
                     </div>
                 )}
 
+                {/* Past holdings */}
                 {pastHolds.length > 0 && (
                     <div>
-                        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: '#64748b' }}>
-                            <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />
-                            Past Holdings ({pastHolds.length})
+                        <h2 className="text-lg font-bold mb-4" style={{ color: '#111827' }}>
+                            Past holdings
                         </h2>
                         <div className="flex flex-col gap-4">
                             {pastHolds.map(hold => (
@@ -425,16 +398,14 @@ export default function MyHolds() {
                     >
                         <div
                             className="w-16 h-16 rounded-full flex items-center justify-center"
-                            style={{ background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)' }}
+                            style={{ background: '#dcfce7' }}
                         >
                             <Phone size={28} color="#16a34a" />
                         </div>
 
                         <div className="text-center">
-                            <h3 className="text-lg font-bold" style={{ color: '#0f172a' }}>
-                                Contact Us
-                            </h3>
-                            <p className="text-sm mt-1" style={{ color: '#64748b' }}>
+                            <h3 className="text-lg font-bold" style={{ color: '#111827' }}>Contact Us</h3>
+                            <p className="text-sm mt-1" style={{ color: '#6b7280' }}>
                                 Call us for more details about your holding
                             </p>
                         </div>
@@ -457,7 +428,7 @@ export default function MyHolds() {
                             +91 123456789
                         </a>
 
-                        <p className="text-xs text-center" style={{ color: '#94a3b8' }}>
+                        <p className="text-xs text-center" style={{ color: '#9ca3af' }}>
                             Available Mon–Sat, 9:00 AM – 6:00 PM
                         </p>
 
@@ -479,9 +450,8 @@ export default function MyHolds() {
                         </button>
                     </div>
                 </div>
-            )
-            }
+            )}
 
-        </div >
+        </div>
     )
 }

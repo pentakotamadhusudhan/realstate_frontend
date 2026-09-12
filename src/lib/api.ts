@@ -1,4 +1,6 @@
 export const API_BASE_URL = "http://192.168.1.10:8000/api"
+// export const API_BASE_URL = "http://10.164.215.3:8000/api"
+
 
 export const ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login/`,

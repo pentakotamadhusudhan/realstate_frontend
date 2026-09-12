@@ -5,6 +5,7 @@ import PlotMap from '../components/PlotMap'
 import PlotDetailsDrawer from '../components/PlotDetailsDrawer'
 import { usePlotStore } from '../store/plotStore'
 import { MapPin, ArrowLeft } from 'lucide-react'
+import LoadingScreen from '../components/LoadingComponent'
 
 export default function Dashboard() {
   const { selectedPlot, fetchPlots, isLoading, error, allPlots } = usePlotStore()
@@ -19,12 +20,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-gray-950 text-white">
-        <div className="text-center">
-          <div className="text-4xl mb-3">⚙️</div>
-          <p className="text-gray-400">Loading plots...</p>
-        </div>
-      </div>
+      <LoadingScreen />
     )
   }
 

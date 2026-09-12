@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import hook
 import { LoginForm } from '../components/LoginForms';
 import { ENDPOINTS, saveTokens } from '../lib/api'
+import loginBackground from "../assets/login_background.jpg";
 
 
 interface AuthApiResponse {
@@ -75,7 +76,7 @@ export const LoginPage: React.FC = () => {
 
     return (
         <div className="estate-login-split-page">
-            <div className="showcase-side">
+            <div className="showcase-side" style={{ backgroundImage: `url(${loginBackground})` }}>
                 <div className="showcase-overlay" />
                 <div className="showcase-content">
                     <div className="trending-badge">✦ Over 10,000+ Premium Properties Available</div>

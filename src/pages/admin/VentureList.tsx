@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, ENDPOINTS } from '../../lib/api'
+import LoadingScreen from '../../components/LoadingComponent'
 
 interface Venture {
   id: string
@@ -72,10 +73,7 @@ export default function VentureList() {
       <div className="max-w-4xl mx-auto px-8 py-10">
         {/* Loading State */}
         {loading && (
-          <div className="text-center text-gray-400 py-20">
-            <div className="text-4xl mb-3 animate-spin">⚙️</div>
-            <p>Loading ventures...</p>
-          </div>
+          <LoadingScreen />
         )}
 
         {/* Error State */}
