@@ -1,7 +1,7 @@
 import { MapPin, Moon, Sun, Maximize2, Minimize2, Phone, ChevronDown, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePlotStore } from '../store/plotStore';
-import { clearTokens } from '../lib/api';
+import { logout } from '../lib/auth';
 
 const TOWNSHIP_NAME = 'Premium Plots';
 
@@ -12,10 +12,8 @@ export default function Navbar() {
   const available = allPlots.filter((p) => p.status === 'available').length;
   const total = allPlots.length;
 
-  function handleLogout() {
-    clearTokens();
-    localStorage.removeItem('user_profile');
-    navigate('/login');
+  async function handleLogout() {
+    await logout(navigate);
   }
 
   return (

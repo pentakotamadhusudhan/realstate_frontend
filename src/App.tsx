@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegistrationPage'
+import AuthCallback from './pages/AuthCallback'
 import Dashboard from './pages/Dashboard'
 import AdminLogin from './pages/admin/AdminLogin'
 import VentureList from './pages/admin/VentureList'
@@ -9,7 +10,7 @@ import VentureCreate from './pages/admin/VentureCreate'
 import VenturePlotUpload from './pages/admin/VenturePlotUpload'
 import ProtectedRoute from './components/ProtectedRoute'
 import VentureSelect from './pages/VentureSelect'
-import MyHolds from './pages/myholds'
+import MyHolds from './pages/MyHolds'
 import './App.css'
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         {/* Customer public */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Customer protected */}
         <Route path="/ventures" element={<ProtectedRoute><VentureSelect /></ProtectedRoute>} />

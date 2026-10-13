@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, ENDPOINTS } from '../../lib/api'
+import { logout } from '../../lib/auth'
+import { LogOut } from 'lucide-react'
 import LoadingScreen from '../../components/LoadingComponent'
 
 interface Venture {
@@ -62,12 +64,22 @@ export default function VentureList() {
           <p className="text-gray-400 text-sm">Select a venture to add plots</p>
         </div>
 
-        <a
-          href="/admin/ventures/create"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition"
-        >
-          + New Venture
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href="/admin/ventures/create"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition"
+          >
+            + New Venture
+          </a>
+          <button
+            onClick={() => logout(navigate)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-gray-800 text-gray-400 hover:text-white"
+            title="Sign out"
+          >
+            <LogOut size={14} />
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-8 py-10">

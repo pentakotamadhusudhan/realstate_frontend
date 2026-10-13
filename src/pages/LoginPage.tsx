@@ -1,38 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import hook
+import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForms';
-import { ENDPOINTS, saveTokens } from '../lib/api'
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
+import { ENDPOINTS } from '../lib/api';
+import { saveSession, type AuthApiResponse } from '../lib/auth';
 import loginBackground from "../assets/login_background.jpg";
-
-
-interface AuthApiResponse {
-    user: {
-        id: string;
-        full_name: string;
-        email: string;
-        mobile_number: string;
-        user_type: string;
-        auth_provider: string;
-        is_verified: boolean;
-        created_at: string;
-    };
-    tokens: {
-        refresh: string;
-        access: string;
-    };
-}
 
 export const LoginPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    // ✅ FIX: Hook declared at the top level of the component body
     const navigate = useNavigate();
 
     const handleAuthSubmit = async (credentials: { email: string; password: string }) => {
         setIsSubmitting(true);
         setErrorMessage('');
-        const endpoint = ENDPOINTS.login
+        const endpoint = ENDPOINTS.login;
 
         const loginPayload = {
             identifier: credentials.email,
@@ -56,15 +39,9 @@ export const LoginPage: React.FC = () => {
             }
 
             const verifiedData = data as AuthApiResponse;
+            saveSession(verifiedData.user, verifiedData.tokens);
 
-            saveTokens(verifiedData.tokens.access, verifiedData.tokens.refresh)
-            localStorage.setItem('user_profile', JSON.stringify(verifiedData.user));
-
-            alert(`Welcome back, ${verifiedData.user.full_name}! Let’s find your next home.`);
-
-            // ✅ Using the instantiated navigate function here is now safe
-            // navigate('/dashboard');
-            navigate('/ventures')
+            navigate('/ventures');
 
         } catch (error: any) {
             console.error('Auth API Error:', error);
@@ -105,8 +82,40 @@ export const LoginPage: React.FC = () => {
                     onSubmit={handleAuthSubmit}
                 />
 
-                <div className="auth-mode-toggle">
-                    <p className="form-footer">
+                <div style={{ width: '100%', maxWidth: '420px', marginTop: '1.25rem' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            margin: '1.25rem 0',
+                            color: '#94a3b8',
+                        }}
+                    >
+                        <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
+                        <span
+                            style={{
+                                padding: '0 0.75rem',
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                                color: '#94a3b8',
+                            }}
+                        >
+                            Or continue with
+                        </span>
+                        <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
+                    </div>
+
+                    <GoogleSignInButton
+                        mode="signin"
+                        onSuccess={() => navigate('/ventures')}
+                        onError={(err) => setErrorMessage(err)}
+                    />
+                </div>
+
+                <div className="auth-mode-toggle" style={{ marginTop: '1.5rem' }}>
+                    <p className="form-footer" style={{ marginTop: '0' }}>
                         New to Hearth & Key?{' '}
                         <a href="/register" className="forgot-link">Create an account</a>
                     </p>

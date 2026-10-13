@@ -21,6 +21,7 @@ export interface Plot {
   description?: string;
   facing?: string;
   dimensions?: string;
+  corner?: boolean;
   corner_plot?: boolean;
   notes?: string;
   images?: string[];

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, ENDPOINTS, API_BASE_URL } from '../lib/api'
-import { MapPin, Clock, CheckCircle, XCircle, ArrowLeft, Phone } from 'lucide-react'
+import { logout } from '../lib/auth'
+import { MapPin, Clock, CheckCircle, XCircle, ArrowLeft, Phone, LogOut } from 'lucide-react'
+import BoxLoader from '@/components/ui/box-loader'
 
 interface Hold {
     id: string
@@ -278,10 +280,12 @@ export default function MyHolds() {
                         Back to Ventures
                     </button>
                     <button
-                        onClick={() => { localStorage.clear(); navigate('/login') }}
-                        className="text-xs px-3 py-1.5 rounded-lg transition hover:opacity-80"
+                        onClick={() => logout(navigate)}
+                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition hover:opacity-80"
                         style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+                        title="Sign out"
                     >
+                        <LogOut size={12} />
                         Logout
                     </button>
                 </div>
@@ -311,9 +315,9 @@ export default function MyHolds() {
 
                 {loading && (
                     <div className="flex items-center justify-center py-20">
-                        <div className="text-center">
-                            <div className="text-4xl mb-3">⚙️</div>
-                            <p style={{ color: '#6b7280' }}>Loading your holdings...</p>
+                        <div className="flex flex-col items-center text-center">
+                            <BoxLoader />
+                            <p className="mt-8 text-sm font-medium text-gray-500">Loading your holdings...</p>
                         </div>
                     </div>
                 )}

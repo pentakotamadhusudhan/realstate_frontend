@@ -1,29 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RegisterForm, type RegisterPayload } from '../components/RegistrationForms';
-import { ENDPOINTS, saveTokens } from '../lib/api';
-
-interface ApiResponse {
-    user: {
-        id: string;
-        full_name: string;
-        email: string;
-        mobile_number: string;
-        user_type: string;
-        auth_provider: string;
-        is_verified: boolean;
-        created_at: string;
-    };
-    tokens: {
-        refresh: string;
-        access: string;
-    };
-}
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
+import { ENDPOINTS } from '../lib/api';
+import { saveSession, type AuthApiResponse } from '../lib/auth';
 
 export const RegisterPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState('');
-    const [successData, setSuccessData] = useState<ApiResponse | null>(null);
+    const [successData, setSuccessData] = useState<AuthApiResponse | null>(null);
     const navigate = useNavigate();
 
     const handleRegisterSubmit = async (payload: RegisterPayload) => {
@@ -44,13 +29,11 @@ export const RegisterPage: React.FC = () => {
                 throw new Error(data.message || JSON.stringify(data) || 'Something went wrong during registration.');
             }
 
-            const verifiedData = data as ApiResponse;
+            const verifiedData = data as AuthApiResponse;
             setSuccessData(verifiedData);
-            saveTokens(verifiedData.tokens.access, verifiedData.tokens.refresh);
-            localStorage.setItem('user_profile', JSON.stringify(verifiedData.user));
+            saveSession(verifiedData.user, verifiedData.tokens);
 
-            alert(`Registration Successful! Welcome ${verifiedData.user.full_name}`);
-            navigate('/dashboard');
+            navigate('/ventures');
 
         } catch (error: any) {
             console.error('Registration API Error:', error);
@@ -88,14 +71,47 @@ export const RegisterPage: React.FC = () => {
                     <div className="success-confirmation-card">
                         <h3>Account Configured!</h3>
                         <p>Welcome, <strong>{successData.user.full_name}</strong>.</p>
-                        <span className="status-pill">Status: Active (Unverified)</span>
-                        <p className="subtext">Tokens injected seamlessly. Directing you to dashboard...</p>
+                        <span className="status-pill">Status: Active</span>
+                        <p className="subtext">Tokens injected seamlessly. Directing you to ventures...</p>
                     </div>
                 ) : (
                     <>
                         <RegisterForm loading={isSubmitting} onSubmit={handleRegisterSubmit} />
-                        <div className="auth-mode-toggle">
-                            <p className="form-footer">
+
+                        <div style={{ width: '100%', maxWidth: '420px', marginTop: '1.25rem' }}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    margin: '1.25rem 0',
+                                    color: '#94a3b8',
+                                }}
+                            >
+                                <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
+                                <span
+                                    style={{
+                                        padding: '0 0.75rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        color: '#94a3b8',
+                                    }}
+                                >
+                                    Or continue with
+                                </span>
+                                <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
+                            </div>
+
+                            <GoogleSignInButton
+                                mode="signup"
+                                onSuccess={() => navigate('/ventures')}
+                                onError={(err) => setApiError(err)}
+                            />
+                        </div>
+
+                        <div className="auth-mode-toggle" style={{ marginTop: '1.5rem' }}>
+                            <p className="form-footer" style={{ marginTop: '0' }}>
                                 Already have an account?{' '}
                                 <a href="/login" className="forgot-link">Sign in here</a>
                             </p>

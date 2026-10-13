@@ -1,10 +1,20 @@
-export const API_BASE_URL = "http://192.168.1.18:8000/api"
-// export const API_BASE_URL = "http://10.164.215.3:8000/api"
-
+export const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    (typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:8000/api'
+        : 'http://192.168.1.18:8000/api')
 
 export const ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login/`,
     register: `${API_BASE_URL}/auth/register/customer/`,
+    google: `${API_BASE_URL}/auth/google/`,
+    googleUrl: (redirectUri?: string) =>
+        `${API_BASE_URL}/auth/google/url/${
+            redirectUri ? `?redirect_uri=${encodeURIComponent(redirectUri)}` : ''
+        }`,
+    socialLogin: `${API_BASE_URL}/auth/social-login/`,
+    logout: `${API_BASE_URL}/auth/logout/`,
     me: `${API_BASE_URL}/auth/me/`,
     ventures: `${API_BASE_URL}/ventures/`,
     plots: `${API_BASE_URL}/plots/`,
