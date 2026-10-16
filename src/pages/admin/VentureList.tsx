@@ -4,6 +4,9 @@ import { apiFetch, ENDPOINTS } from '../../lib/api'
 import { logout } from '../../lib/auth'
 import { LogOut } from 'lucide-react'
 import LoadingScreen from '../../components/LoadingComponent'
+import ApiErrorAlert from '../../components/alter_box/ApiErrorAlert'
+import { formatApiErrorMessage } from '../../utils/formatApiError'
+import AdminNavbar from '../../components/admin/AdminNavbar'
 
 interface Venture {
   id: string
@@ -33,19 +36,20 @@ export default function VentureList() {
   console.log("ventures log", ENDPOINTS.ventures);
 
 
-  useEffect(() => {
-    async function fetchVentures() {
-      try {
-        console.log("ventures log", ENDPOINTS.ventures);
-        const data = await apiFetch(ENDPOINTS.ventures)
-        console.log("ventures log", data);
-        setVentures(data.results ?? data)
-      } catch (err: any) {
-        setError('Failed to load ventures.')
-      } finally {
-        setLoading(false)
-      }
+  async function fetchVentures() {
+    setLoading(true)
+    setError('')
+    try {
+      const data = await apiFetch(ENDPOINTS.ventures)
+      setVentures(data.results ?? data)
+    } catch (err: any) {
+      setError(formatApiErrorMessage(err) || 'Failed to load ventures.')
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
     fetchVentures()
   }, [])
 
@@ -58,29 +62,7 @@ export default function VentureList() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 px-8 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold">My Ventures</h1>
-          <p className="text-gray-400 text-sm">Select a venture to add plots</p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <a
-            href="/admin/ventures/create"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition"
-          >
-            + New Venture
-          </a>
-          <button
-            onClick={() => logout(navigate)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-gray-800 text-gray-400 hover:text-white"
-            title="Sign out"
-          >
-            <LogOut size={14} />
-            Logout
-          </button>
-        </div>
-      </div>
+      <AdminNavbar />
 
       <div className="max-w-4xl mx-auto px-8 py-10">
         {/* Loading State */}
@@ -90,8 +72,12 @@ export default function VentureList() {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg mb-6">
-            {error}
+          <div className="mb-6">
+            <ApiErrorAlert
+              message={error}
+              onRetry={fetchVentures}
+              onClose={() => setError('')}
+            />
           </div>
         )}
 

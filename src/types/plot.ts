@@ -25,6 +25,7 @@ export interface Plot {
   corner_plot?: boolean;
   notes?: string;
   images?: string[];
+  venture?: string;
 }
 
 export interface SpecialFeature {

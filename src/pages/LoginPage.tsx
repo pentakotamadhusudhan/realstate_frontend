@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForms';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { ENDPOINTS } from '../lib/api';
 import { saveSession, type AuthApiResponse } from '../lib/auth';
+import ApiErrorAlert from '../components/alter_box/ApiErrorAlert';
+import { formatApiErrorMessage } from '../utils/formatApiError';
 import loginBackground from "../assets/login_background.jpg";
 
 export const LoginPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const lastCredentialsRef = useRef<{ email: string; password: string } | null>(null);
 
     const navigate = useNavigate();
 
     const handleAuthSubmit = async (credentials: { email: string; password: string }) => {
+        lastCredentialsRef.current = credentials;
         setIsSubmitting(true);
         setErrorMessage('');
         const endpoint = ENDPOINTS.login;
@@ -32,10 +36,11 @@ export const LoginPage: React.FC = () => {
                 body: JSON.stringify(loginPayload),
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                throw new Error(data.message || data.detail || JSON.stringify(data) || 'Authentication failed.');
+                const errorMsg = formatApiErrorMessage(data) || 'Authentication failed.';
+                throw new Error(errorMsg);
             }
 
             const verifiedData = data as AuthApiResponse;
@@ -45,7 +50,8 @@ export const LoginPage: React.FC = () => {
 
         } catch (error: any) {
             console.error('Auth API Error:', error);
-            setErrorMessage(error.message || 'Network connectivity issues. Please try again.');
+            const msg = formatApiErrorMessage(error);
+            setErrorMessage(msg);
         } finally {
             setIsSubmitting(false);
         }
@@ -74,7 +80,15 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <div className="form-side">
-                {errorMessage && <div className="toast-error-banner">{errorMessage}</div>}
+                {errorMessage && (
+                    <div style={{ width: '100%', maxWidth: '420px', marginBottom: '1.25rem' }}>
+                        <ApiErrorAlert
+                            message={errorMessage}
+                            onRetry={lastCredentialsRef.current ? () => handleAuthSubmit(lastCredentialsRef.current!) : undefined}
+                            onClose={() => setErrorMessage('')}
+                        />
+                    </div>
+                )}
 
                 <LoginForm
                     loading={isSubmitting}
@@ -110,7 +124,7 @@ export const LoginPage: React.FC = () => {
                     <GoogleSignInButton
                         mode="signin"
                         onSuccess={() => navigate('/ventures')}
-                        onError={(err) => setErrorMessage(err)}
+                        onError={(err) => setErrorMessage(formatApiErrorMessage(err))}
                     />
                 </div>
 

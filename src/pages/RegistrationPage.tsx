@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RegisterForm, type RegisterPayload } from '../components/RegistrationForms';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { ENDPOINTS } from '../lib/api';
 import { saveSession, type AuthApiResponse } from '../lib/auth';
+import ApiErrorAlert from '../components/alter_box/ApiErrorAlert';
+import { formatApiErrorMessage } from '../utils/formatApiError';
 
 export const RegisterPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState('');
     const [successData, setSuccessData] = useState<AuthApiResponse | null>(null);
+    const lastPayloadRef = useRef<RegisterPayload | null>(null);
     const navigate = useNavigate();
 
     const handleRegisterSubmit = async (payload: RegisterPayload) => {
+        lastPayloadRef.current = payload;
         setIsSubmitting(true);
         setApiError('');
         setSuccessData(null);
@@ -23,10 +27,11 @@ export const RegisterPage: React.FC = () => {
                 body: JSON.stringify(payload),
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                throw new Error(data.message || JSON.stringify(data) || 'Something went wrong during registration.');
+                const errorMsg = formatApiErrorMessage(data) || 'Something went wrong during registration.';
+                throw new Error(errorMsg);
             }
 
             const verifiedData = data as AuthApiResponse;
@@ -37,7 +42,8 @@ export const RegisterPage: React.FC = () => {
 
         } catch (error: any) {
             console.error('Registration API Error:', error);
-            setApiError(error.message || 'Network connectivity issues. Please try again.');
+            const msg = formatApiErrorMessage(error);
+            setApiError(msg);
         } finally {
             setIsSubmitting(false);
         }
@@ -65,7 +71,15 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div className="form-side">
-                {apiError && <div className="toast-error-banner">{apiError}</div>}
+                {apiError && (
+                    <div style={{ width: '100%', maxWidth: '420px', marginBottom: '1.25rem' }}>
+                        <ApiErrorAlert
+                            message={apiError}
+                            onRetry={lastPayloadRef.current ? () => handleRegisterSubmit(lastPayloadRef.current!) : undefined}
+                            onClose={() => setApiError('')}
+                        />
+                    </div>
+                )}
 
                 {successData ? (
                     <div className="success-confirmation-card">
@@ -106,7 +120,7 @@ export const RegisterPage: React.FC = () => {
                             <GoogleSignInButton
                                 mode="signup"
                                 onSuccess={() => navigate('/ventures')}
-                                onError={(err) => setApiError(err)}
+                                onError={(err) => setApiError(formatApiErrorMessage(err))}
                             />
                         </div>
 

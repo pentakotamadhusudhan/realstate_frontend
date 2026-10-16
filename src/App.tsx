@@ -12,10 +12,18 @@ import ProtectedRoute from './components/ProtectedRoute'
 import VentureSelect from './pages/VentureSelect'
 import MyHolds from './pages/MyHolds'
 import './App.css'
+import AgentRegisterPage from './pages/admin/AgentRegistrationPage'
+import Unverifiedagent from './pages/admin/UnverifiedScreen'
+import AdminAgentsPage from './pages/admin/AdminAgentsPage'
+import AdminMembershipsPage from './pages/admin/AdminMembershipsPage'
+import AdminPlotApprovalsPage from './pages/admin/AdminPlotApprovalsPage'
+import AdminCallQueriesPage from './pages/admin/AdminCallQueriesPage'
+import GlobalApiErrorContainer from './components/alter_box/GlobalApiErrorContainer'
 
 function App() {
   return (
     <BrowserRouter>
+      <GlobalApiErrorContainer />
       <Routes>
         {/* Root */}
         <Route path="/" element={<Navigate to="/login" replace />} />
@@ -30,12 +38,20 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/my-holds" element={<ProtectedRoute><MyHolds /></ProtectedRoute>} />
 
-        {/* Admin */}
+        {/* Admin & Agent Hub */}
         <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/ventures" element={<ProtectedRoute><VentureList /></ProtectedRoute>} />
         <Route path="/admin/ventures/create" element={<ProtectedRoute><VentureCreate /></ProtectedRoute>} />
         <Route path="/admin/ventures/:slug/plots" element={<ProtectedRoute><VenturePlotUpload /></ProtectedRoute>} />
+        <Route path="/admin/agents" element={<ProtectedRoute><AdminAgentsPage /></ProtectedRoute>} />
+        <Route path="/admin/memberships" element={<ProtectedRoute><AdminMembershipsPage /></ProtectedRoute>} />
+        <Route path="/admin/approvals" element={<ProtectedRoute><AdminPlotApprovalsPage /></ProtectedRoute>} />
+        <Route path="/admin/queries" element={<ProtectedRoute><AdminCallQueriesPage /></ProtectedRoute>} />
+
+        {/* Agent Registration & Verification Status */}
+        <Route path="/agent-register" element={<AgentRegisterPage />} />
+        <Route path="/unverified" element={<Unverifiedagent />} />
 
         {/* Catch all — must be last */}
         <Route path="*" element={<Navigate to="/login" replace />} />

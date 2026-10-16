@@ -4,6 +4,8 @@ import { apiFetch, ENDPOINTS, API_BASE_URL } from '../lib/api'
 import { logout } from '../lib/auth'
 import { MapPin, Clock, CheckCircle, XCircle, ArrowLeft, Phone, LogOut } from 'lucide-react'
 import BoxLoader from '@/components/ui/box-loader'
+import ApiErrorAlert from '../components/alter_box/ApiErrorAlert'
+import { formatApiErrorMessage } from '../utils/formatApiError'
 
 interface Hold {
     id: string
@@ -205,8 +207,8 @@ export default function MyHolds() {
         try {
             const data = await apiFetch(ENDPOINTS.myHolds)
             setHolds(data.results ?? data)
-        } catch {
-            setError('Failed to load your holdings.')
+        } catch (err: any) {
+            setError(formatApiErrorMessage(err) || 'Failed to load your holdings.')
         } finally {
             setLoading(false)
         }
@@ -323,9 +325,12 @@ export default function MyHolds() {
                 )}
 
                 {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm">
-                        {error}
-                        <button onClick={fetchHolds} className="ml-3 underline font-medium">Retry</button>
+                    <div className="mb-6">
+                        <ApiErrorAlert
+                            message={error}
+                            onRetry={fetchHolds}
+                            onClose={() => setError('')}
+                        />
                     </div>
                 )}
 

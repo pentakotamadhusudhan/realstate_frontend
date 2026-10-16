@@ -25,7 +25,7 @@ interface DXFImportPanelProps {
 type Step = 'upload' | 'layers' | 'origin' | 'parsing' | 'done' | 'error'
 
 const API_BASE =
-    (import.meta.env.VITE_API_BASE_URL as string | undefined) || 'http://192.168.1.18:8000/api'
+    (import.meta.env.VITE_API_BASE_URL as string | undefined) || 'http://172.20.10.2:8000/api'
 
 export default function DXFImportPanel({
     slug,

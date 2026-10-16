@@ -1,25 +1,61 @@
 import { ENDPOINTS, saveTokens, clearTokens, getAccessToken, getRefreshToken } from './api'
 
+export interface ActiveMembershipInfo {
+    id: string;
+    plan_id: string;
+    plan_name: string;
+    plan_type: 'AGENT' | 'ADMIN';
+    status: string;
+    start_date: string;
+    end_date: string;
+    is_valid: boolean;
+}
+
 export interface UserProfile {
-    id: string
-    full_name: string
-    email: string
-    mobile_number: string
-    user_type: string
-    auth_provider: string
-    social_id?: string
-    is_verified: boolean
-    created_at?: string
+    id: string;
+    full_name: string;
+    email: string;
+    mobile_number: string;
+    user_type: string;
+    auth_provider: string;
+    social_id?: string;
+    is_verified: boolean;
+    is_active?: boolean;
+    has_active_membership?: boolean;
+    active_membership?: ActiveMembershipInfo | null;
+    created_at?: string;
+}
+
+export function isAgent(user?: UserProfile | null): boolean {
+    const u = user !== undefined ? user : getUserProfile();
+    return u?.user_type === 'AGENT';
+}
+
+export function isSuperAdmin(user?: UserProfile | null): boolean {
+    const u = user !== undefined ? user : getUserProfile();
+    return u?.user_type === 'SUPER_ADMIN';
+}
+
+export function isAdmin(user?: UserProfile | null): boolean {
+    const u = user !== undefined ? user : getUserProfile();
+    return u?.user_type === 'ADMIN' || u?.user_type === 'SUPER_ADMIN';
+}
+
+export function hasActiveMembership(user?: UserProfile | null): boolean {
+    const u = user !== undefined ? user : getUserProfile();
+    if (!u) return false;
+    if (isAdmin(u)) return true;
+    return Boolean(u.has_active_membership || u.active_membership?.is_valid);
 }
 
 export interface AuthTokens {
-    access: string
-    refresh: string
+    access: string;
+    refresh: string;
 }
 
 export interface AuthApiResponse {
-    user: UserProfile
-    tokens: AuthTokens
+    user: UserProfile;
+    tokens: AuthTokens;
 }
 
 export function saveSession(user: UserProfile, tokens: AuthTokens) {

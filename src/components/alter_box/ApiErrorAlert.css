@@ -1,0 +1,187 @@
+.api-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    animation: overlayIn 0.2s ease-out;
+}
+
+.api-dialog {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    padding: 36px 30px 28px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    background: linear-gradient(145deg, #ffffff, #fff8f8);
+    box-shadow: 0 25px 80px rgba(15, 23, 42, 0.25);
+    text-align: center;
+    animation: dialogIn 0.3s ease-out;
+}
+
+.api-dialog-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.api-dialog-close:hover {
+    background: #ffe4e6;
+    color: #e5484d;
+}
+
+.api-dialog-icon {
+    width: 82px;
+    height: 82px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 20px;
+    border: 1px solid #ffd5da;
+    border-radius: 25px;
+    background: linear-gradient(145deg, #fff0f1, #ffe0e4);
+    color: #e5484d;
+    box-shadow: 0 8px 22px rgba(229, 72, 77, 0.1);
+}
+
+.api-dialog-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 30px;
+    background: #fff0f1;
+    color: #c52b39;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.api-dialog h2 {
+    margin: 15px 0 10px;
+    color: #172033;
+    font-size: 26px;
+    font-weight: 750;
+}
+
+.api-dialog-message {
+    margin: 0 auto 22px;
+    max-width: 320px;
+    color: #647084;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.api-dialog-detail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 13px;
+    margin-bottom: 24px;
+    border: 1px solid #ffe0e4;
+    border-radius: 12px;
+    background: #fff4f5;
+    color: #b42332;
+    font-size: 13px;
+}
+
+.api-dialog-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.api-dialog-actions button {
+    flex: 1;
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.api-dialog-secondary {
+    border: 1px solid #dce2eb;
+    background: white;
+    color: #475569;
+}
+
+.api-dialog-secondary:hover {
+    background: #f1f5f9;
+}
+
+.api-dialog-primary {
+    border: 1px solid #e5484d;
+    background: linear-gradient(135deg, #f87171, #dc3545);
+    color: white;
+    box-shadow: 0 5px 14px rgba(220, 53, 69, 0.2);
+}
+
+.api-dialog-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(220, 53, 69, 0.28);
+}
+
+.api-dialog button:focus-visible {
+    outline: 3px solid #fda4af;
+    outline-offset: 3px;
+}
+
+@keyframes overlayIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes dialogIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 480px) {
+    .api-dialog {
+        padding: 32px 20px 22px;
+        border-radius: 20px;
+    }
+
+    .api-dialog h2 {
+        font-size: 23px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .api-dialog-overlay,
+    .api-dialog {
+        animation: none;
+    }
+}

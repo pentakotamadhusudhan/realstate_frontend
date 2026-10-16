@@ -72,6 +72,7 @@ function mapApiPlot(apiPlot: any): Plot {
     facing: apiPlot.facing || '',
     dimensions: apiPlot.dimensions || '',
     corner_plot: apiPlot.corner_plot || false,
+    venture: apiPlot.venture,
   }
 }
 

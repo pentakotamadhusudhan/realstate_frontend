@@ -1,0 +1,389 @@
+* {
+    box-sizing: border-box;
+}
+
+.agent-layout {
+    min-height: 100vh;
+    display: flex;
+    background: #f7f9fc;
+    color: #142447;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+.agent-sidebar {
+    width: 245px;
+    background: #fff;
+    border-right: 1px solid #e5eaf2;
+    padding: 26px 16px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px 38px;
+}
+
+.brand-icon {
+    font-size: 38px;
+    color: #2868f5;
+}
+
+.brand h2,
+.brand small,
+.agent-user small {
+    display: block;
+    margin: 0;
+}
+
+.brand h2 {
+    font-size: 19px;
+}
+
+.brand small,
+.agent-user small {
+    color: #71809c;
+    margin-top: 5px;
+}
+
+.agent-nav {
+    display: grid;
+    gap: 10px;
+}
+
+.agent-nav a,
+.logout {
+    padding: 13px 14px;
+    border-radius: 9px;
+    text-decoration: none;
+    color: #344767;
+    font-size: 14px;
+}
+
+.agent-nav a.active {
+    color: #1760ed;
+    background: #edf3ff;
+    border-right: 3px solid #2868f5;
+}
+
+.agent-nav a:hover,
+.logout:hover {
+    background: #f1f5fb;
+}
+
+.logout {
+    margin-top: auto;
+}
+
+.agent-main {
+    flex: 1;
+    min-width: 0;
+    padding: 34px;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.agent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.agent-header h2 {
+    font-size: 28px;
+    margin: 0 0 8px;
+}
+
+.agent-header p,
+.section-description {
+    color: #6c7b97;
+    margin: 0;
+    line-height: 1.7;
+}
+
+.agent-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    background: #e8eef8;
+    font-size: 22px;
+}
+
+.agent-user strong {
+    font-size: 14px;
+}
+
+.agent-user small {
+    font-size: 12px;
+}
+
+.verification-alert {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 28px;
+    border: 1px solid #f4c44f;
+    border-radius: 12px;
+    background: #fffaf0;
+    margin-bottom: 26px;
+}
+
+.alert-icon {
+    width: 62px;
+    height: 62px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #ffedbd;
+    color: #bd8000;
+    font-size: 36px;
+    font-weight: 800;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.status-pill {
+    display: inline-block;
+    color: #936000;
+    background: #ffefc5;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.alert-content h1 {
+    font-size: 23px;
+    margin: 0 0 10px;
+}
+
+.alert-content p {
+    color: #53647f;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.alert-art {
+    font-size: 66px;
+    padding: 0 16px;
+}
+
+.verification-card,
+.benefits-card {
+    background: white;
+    border: 1px solid #e2e9f3;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 26px;
+}
+
+.verification-card h2,
+.benefits-card h2 {
+    font-size: 21px;
+    margin: 0 0 8px;
+}
+
+.verification-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+    margin: 36px 0 30px;
+}
+
+.verification-step {
+    text-align: center;
+}
+
+.step-number {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #2868f5;
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.verification-step h3 {
+    font-size: 14px;
+    margin: 0 0 10px;
+}
+
+.verification-step p,
+.benefit p {
+    color: #71809c;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.verify-button {
+    display: block;
+    margin: 0 auto;
+    padding: 15px 32px;
+    border: none;
+    border-radius: 8px;
+    background: #2868f5;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.verify-button:hover {
+    background: #174fca;
+    transform: translateY(-1px);
+}
+
+.review-note {
+    text-align: center;
+    font-size: 12px;
+    color: #7a879c;
+    margin: 15px 0 0;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 26px;
+}
+
+.benefit {
+    padding: 4px 16px;
+    border-right: 1px solid #e2e9f3;
+}
+
+.benefit:last-child {
+    border-right: none;
+}
+
+.benefit-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 12px;
+    border-radius: 50%;
+    color: #2868f5;
+    background: #edf3ff;
+    font-size: 22px;
+}
+
+.benefit h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+}
+
+.agent-footer {
+    color: #71809c;
+    font-size: 13px;
+    padding: 4px;
+}
+
+.agent-footer a {
+    color: #2868f5;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .agent-sidebar {
+        width: 190px;
+    }
+
+    .agent-main {
+        padding: 22px;
+    }
+
+    .verification-steps,
+    .benefits-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .benefit:nth-child(2) {
+        border-right: none;
+    }
+
+    .alert-art {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .agent-sidebar {
+        display: none;
+    }
+
+    .agent-main {
+        padding: 18px 14px;
+    }
+
+    .agent-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .agent-header h2 {
+        font-size: 24px;
+    }
+
+    .verification-alert {
+        padding: 18px;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .alert-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 26px;
+    }
+
+    .alert-content h1 {
+        font-size: 19px;
+    }
+
+    .verification-card,
+    .benefits-card {
+        padding: 20px 16px;
+    }
+
+    .verification-steps,
+    .benefits-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .benefit {
+        border-right: none;
+        border-bottom: 1px solid #e2e9f3;
+        padding-bottom: 18px;
+    }
+
+    .benefit:last-child {
+        border-bottom: none;
+    }
+}

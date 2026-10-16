@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ENDPOINTS, saveTokens } from '../../lib/api'
+import ApiErrorAlert from '../../components/alter_box/ApiErrorAlert'
+import { formatApiErrorMessage } from '../../utils/formatApiError'
 
 export default function AdminLogin() {
     const [identifier, setIdentifier] = useState('')
@@ -9,8 +11,8 @@ export default function AdminLogin() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
+    async function handleSubmit(e?: React.FormEvent) {
+        if (e) e.preventDefault()
         setError('')
         setLoading(true)
 
@@ -21,27 +23,27 @@ export default function AdminLogin() {
                 body: JSON.stringify({
                     identifier,
                     password,
-                    user_type: 'ADMIN',
                 }),
             })
 
-            const data = await response.json()
+            const data = await response.json().catch(() => ({}))
 
             if (!response.ok) {
-                throw new Error(data.detail || JSON.stringify(data) || 'Login failed')
+                const errorMsg = formatApiErrorMessage(data) || 'Login failed.'
+                throw new Error(errorMsg)
             }
 
             // Check user is admin or super admin
-            if (!['ADMIN', 'SUPER_ADMIN'].includes(data.user.user_type)) {
-                throw new Error('You do not have admin access.')
+            if (!['ADMIN', 'SUPER_ADMIN'].includes(data.user?.user_type)) {
+                throw new Error('This account does not have administrative access.')
             }
 
             saveTokens(data.tokens.access, data.tokens.refresh)
             localStorage.setItem('user_profile', JSON.stringify(data.user))
-            navigate('/admin/ventures')
+            navigate(data.user?.user_type === 'SUPER_ADMIN' ? '/admin/agents' : '/admin/ventures')
 
         } catch (err: any) {
-            setError(err.message || 'Login failed. Please try again.')
+            setError(formatApiErrorMessage(err))
         } finally {
             setLoading(false)
         }
@@ -61,8 +63,12 @@ export default function AdminLogin() {
                 </div>
 
                 {error && (
-                    <div className="bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg mb-6 text-sm">
-                        {error}
+                    <div className="mb-6">
+                        <ApiErrorAlert
+                            message={error}
+                            onRetry={() => handleSubmit()}
+                            onClose={() => setError('')}
+                        />
                     </div>
                 )}
 
@@ -100,7 +106,7 @@ export default function AdminLogin() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-900 text-white py-3 rounded-xl font-semibold transition mt-2"
+                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-900 text-white py-3 rounded-xl font-semibold transition mt-2 cursor-pointer"
                     >
                         {loading ? 'Signing in...' : 'Sign In'}
                     </button>

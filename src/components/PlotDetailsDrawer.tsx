@@ -7,14 +7,24 @@ import {
   Phone,
   MessageSquare,
   Star,
+  User,
+  Clock,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Mail,
 } from 'lucide-react';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { ReactNode } from 'react';
 
 import { usePlotStore } from '../store/plotStore';
 import type { Plot } from '../types/plot';
-import { apiFetch } from '../lib/api';
+import { apiFetch, ENDPOINTS } from '../lib/api';
+import { isAgent, getUserProfile } from '../lib/auth';
+
 
 
 // -----------------------------------------------------
@@ -138,7 +148,31 @@ export default function PlotDetailsDrawer() {
   const [holding, setHolding] = useState(false);
   const [holdSuccess, setHoldSuccess] = useState(false);
   const [holdError, setHoldError] = useState('');
+  
+  // Call Query State
   const [showCallDialog, setShowCallDialog] = useState(false);
+  const user = getUserProfile();
+  const [callName, setCallName] = useState(user?.full_name || '');
+  const [callPhone, setCallPhone] = useState(user?.mobile_number || '');
+  const [callEmail, setCallEmail] = useState(user?.email || '');
+  const [callTime, setCallTime] = useState('Morning (9 AM - 12 PM)');
+  const [callMessage, setCallMessage] = useState('');
+  const [callSubmitting, setCallSubmitting] = useState(false);
+  const [callSuccess, setCallSuccess] = useState(false);
+  const [callError, setCallError] = useState('');
+
+  useEffect(() => {
+    if (showCallDialog) {
+      const u = getUserProfile();
+      if (u) {
+        if (!callName && u.full_name) setCallName(u.full_name);
+        if (!callPhone && u.mobile_number) setCallPhone(u.mobile_number);
+        if (!callEmail && u.email) setCallEmail(u.email);
+      }
+      setCallSuccess(false);
+      setCallError('');
+    }
+  }, [showCallDialog]);
 
   // No selected plot
   if (!selectedPlot) {
@@ -146,6 +180,51 @@ export default function PlotDetailsDrawer() {
   }
 
   const plot: Plot = selectedPlot;
+
+  async function handleCallQuerySubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!callName.trim() || !callPhone.trim()) {
+      setCallError('Please provide your name and phone number.');
+      return;
+    }
+
+    setCallSubmitting(true);
+    setCallError('');
+
+    try {
+      let ventureId = plot.venture;
+      if (!ventureId) {
+        try {
+          const stored = sessionStorage.getItem('customer_venture') || sessionStorage.getItem('selected_venture');
+          if (stored) {
+            const v = JSON.parse(stored);
+            ventureId = v.id;
+          }
+        } catch {}
+      }
+
+      const payload = {
+        venture: ventureId || undefined,
+        plot: plot.id,
+        customer_name: callName.trim(),
+        customer_phone: callPhone.trim(),
+        customer_email: callEmail.trim() || undefined,
+        message: callMessage.trim() || `Inquiry regarding Plot ${plot.plotNumber}`,
+        preferred_call_time: callTime,
+      };
+
+      await apiFetch(ENDPOINTS.callQueries(), {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      setCallSuccess(true);
+    } catch (err: any) {
+      setCallError(err?.detail || err?.message || 'Failed to submit call query. Please try again.');
+    } finally {
+      setCallSubmitting(false);
+    }
+  }
 
   const cfg =
     STATUS_CONFIG[plot.status?.toLowerCase()] ?? DEFAULT_STATUS;
@@ -170,7 +249,7 @@ export default function PlotDetailsDrawer() {
     setHoldSuccess(false);
 
     try {
-      await apiFetch('http://192.168.1.18:8000//holds/', {
+      await apiFetch('http://172.20.10.2:8000//holds/', {
         method: 'POST',
         body: JSON.stringify({
           plot_id: plot.id,
@@ -497,11 +576,33 @@ export default function PlotDetailsDrawer() {
 
       <div className="px-3 pb-4 mt-auto flex flex-col gap-2">
 
-        {/* Book / Hold Button */}
+        {/* Book / Hold Button (Restricted: AGENTS CANNOT BOOK SLOTS) */}
 
         {plot.status?.toLowerCase() === 'available' && (
           <>
-            {holdSuccess ? (
+            {isAgent() ? (
+              <div className="w-full p-3 rounded-xl bg-amber-950/40 border border-amber-700/60 text-amber-200 text-xs flex flex-col gap-2">
+                <div className="flex items-center justify-between font-bold">
+                  <span className="flex items-center gap-1.5 text-amber-300">
+                    🏢 Agent Mode
+                  </span>
+                  <span className="bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border border-amber-700">
+                    Slot Booking Disabled
+                  </span>
+                </div>
+                <p className="text-[11px] text-amber-300/80 leading-relaxed">
+                  Agents cannot book or hold plots directly. Initiate a <strong>Call Query</strong> for buyer leads.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowCallDialog(true)}
+                  className="w-full py-2 rounded-lg text-xs font-bold text-white transition-all bg-emerald-600 hover:bg-emerald-500 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <Phone size={13} />
+                  Initiate Call Query
+                </button>
+              </div>
+            ) : holdSuccess ? (
               <div
                 className="w-full py-3 rounded-xl text-sm font-semibold text-center"
                 style={{
@@ -523,7 +624,7 @@ export default function PlotDetailsDrawer() {
                 type="button"
                 onClick={handleHold}
                 disabled={holding}
-                className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-60"
+                className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-60 cursor-pointer"
                 style={{
                   background:
                     'linear-gradient(135deg, #0f2040, #2563eb)',
@@ -633,107 +734,211 @@ export default function PlotDetailsDrawer() {
 
 
       {/* -------------------------------------------------
-          Call Dialog
+          Call Query Modal (API Integration)
       ------------------------------------------------- */}
 
-      {showCallDialog && (
+      {showCallDialog && createPortal(
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
           style={{
-            background: 'rgba(0,0,0,0.5)',
-            backdropFilter: 'blur(4px)',
+            background: 'rgba(2, 6, 23, 0.75)',
+            backdropFilter: 'blur(6px)',
           }}
           onClick={() => setShowCallDialog(false)}
         >
           <div
-            className="bg-white rounded-2xl p-6 mx-4 flex flex-col items-center gap-4"
-            style={{
-              width: 300,
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-            }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-150"
             onClick={(event) => event.stopPropagation()}
           >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-emerald-950/80 via-gray-900 to-gray-900 px-6 py-5 border-b border-gray-800/80 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <Phone size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    Initiate Call Query
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
+                      Plot {plot.plotNumber}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    Schedule a callback from our sales team or verified agent
+                  </p>
+                </div>
+              </div>
 
-            {/* Icon */}
-
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center"
-              style={{
-                background:
-                  'linear-gradient(135deg, #dcfce7, #bbf7d0)',
-              }}
-            >
-              <Phone size={28} color="#16a34a" />
+              <button
+                type="button"
+                onClick={() => setShowCallDialog(false)}
+                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition"
+              >
+                <X size={18} />
+              </button>
             </div>
 
+            {/* Content / Form */}
+            {callSuccess ? (
+              <div className="p-8 text-center flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 animate-bounce">
+                  <CheckCircle2 size={32} />
+                </div>
+                <h4 className="text-lg font-bold text-white mb-2">Call Query Submitted!</h4>
+                <p className="text-sm text-gray-300 mb-6 max-w-xs leading-relaxed">
+                  Thank you! Our dedicated executive or verified agent will contact you at{' '}
+                  <span className="text-emerald-400 font-semibold">{callPhone}</span> during your preferred time slot ({callTime}).
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowCallDialog(false)}
+                  className="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-medium text-sm transition"
+                >
+                  Close Window
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleCallQuerySubmit} className="p-6 space-y-4">
+                {callError && (
+                  <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center gap-2">
+                    <AlertCircle size={14} className="shrink-0" />
+                    <span>{callError}</span>
+                  </div>
+                )}
 
-            {/* Title */}
+                {/* Plot Quick Overview */}
+                <div className="bg-gray-950/60 border border-gray-800/80 rounded-xl p-3 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-gray-400 block text-[11px]">Selected Property</span>
+                    <span className="text-white font-bold">Plot #{plot.plotNumber}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-gray-400 block text-[11px]">Area / Price</span>
+                    <span className="text-amber-400 font-bold">
+                      {plot.areaSqft} sqft • {formatPrice(plot.price)}
+                    </span>
+                  </div>
+                </div>
 
-            <div className="text-center">
-              <h3
-                className="text-lg font-bold"
-                style={{ color: '#0f172a' }}
-              >
-                Contact Us
-              </h3>
+                {/* Name & Phone */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                      Full Name *
+                    </label>
+                    <div className="relative">
+                      <User size={14} className="absolute left-3 top-3 text-gray-500" />
+                      <input
+                        type="text"
+                        required
+                        value={callName}
+                        onChange={(e) => setCallName(e.target.value)}
+                        placeholder="e.g. John Doe"
+                        className="w-full pl-9 pr-3 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition"
+                      />
+                    </div>
+                  </div>
 
-              <p
-                className="text-sm mt-1"
-                style={{ color: '#64748b' }}
-              >
-                Call us for more details about
-              </p>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                      Phone Number *
+                    </label>
+                    <div className="relative">
+                      <Phone size={14} className="absolute left-3 top-3 text-gray-500" />
+                      <input
+                        type="tel"
+                        required
+                        value={callPhone}
+                        onChange={(e) => setCallPhone(e.target.value)}
+                        placeholder="+91 9876543210"
+                        className="w-full pl-9 pr-3 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-              <p
-                className="text-sm font-semibold"
-                style={{ color: '#0f172a' }}
-              >
-                Plot {plot.plotNumber}
-              </p>
-            </div>
+                {/* Email (Optional) */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    Email Address (Optional)
+                  </label>
+                  <div className="relative">
+                    <Mail size={14} className="absolute left-3 top-3 text-gray-500" />
+                    <input
+                      type="email"
+                      value={callEmail}
+                      onChange={(e) => setCallEmail(e.target.value)}
+                      placeholder="john@example.com"
+                      className="w-full pl-9 pr-3 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition"
+                    />
+                  </div>
+                </div>
 
+                {/* Preferred Callback Time */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5 flex items-center gap-1.5">
+                    <Clock size={13} className="text-emerald-400" />
+                    Preferred Callback Time
+                  </label>
+                  <select
+                    value={callTime}
+                    onChange={(e) => setCallTime(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition"
+                  >
+                    <option value="Morning (9 AM - 12 PM)">Morning (9:00 AM – 12:00 PM)</option>
+                    <option value="Afternoon (12 PM - 4 PM)">Afternoon (12:00 PM – 4:00 PM)</option>
+                    <option value="Evening (4 PM - 7 PM)">Evening (4:00 PM – 7:00 PM)</option>
+                    <option value="Anytime">Anytime during business hours</option>
+                  </select>
+                </div>
 
-            {/* Phone Number */}
+                {/* Inquiry Notes */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    Specific Questions or Notes
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={callMessage}
+                    onChange={(e) => setCallMessage(e.target.value)}
+                    placeholder="e.g. Inquiring about corner plot negotiation or site visit availability..."
+                    className="w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition resize-none"
+                  />
+                </div>
 
-            <a
-              href="tel:+91123456789"
-              className="w-full py-3 rounded-xl text-center font-bold text-lg transition-all hover:opacity-90 active:scale-95"
-              style={{
-                background:
-                  'linear-gradient(135deg, #16a34a, #15803d)',
-                color: 'white',
-              }}
-            >
-              +91 123456789
-            </a>
+                {/* Buttons */}
+                <div className="pt-2 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowCallDialog(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-gray-800 hover:bg-gray-800 text-gray-300 font-medium text-xs transition"
+                  >
+                    Cancel
+                  </button>
 
-
-            {/* Timings */}
-
-            <p
-              className="text-xs text-center"
-              style={{ color: '#94a3b8' }}
-            >
-              Available Mon–Sat, 9:00 AM – 6:00 PM
-            </p>
-
-
-            {/* Close */}
-
-            <button
-              type="button"
-              onClick={() => setShowCallDialog(false)}
-              className="w-full py-2 rounded-xl text-sm font-medium transition-all hover:opacity-80"
-              style={{
-                background: '#f1f5f9',
-                color: '#475569',
-              }}
-            >
-              Close
-            </button>
-
+                  <button
+                    type="submit"
+                    disabled={callSubmitting}
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition disabled:opacity-50"
+                  >
+                    {callSubmitting ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send size={14} />
+                        Request Callback
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>
