@@ -218,11 +218,10 @@ export default function AdminMembershipsPage() {
             {/* Notification Toast */}
             {toastMessage && (
                 <div
-                    className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-semibold transition-all animate-bounce ${
-                        toastMessage.type === 'success'
-                            ? 'bg-emerald-950 border border-emerald-500 text-emerald-200'
-                            : 'bg-rose-950 border border-rose-500 text-rose-200'
-                    }`}
+                    className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-semibold transition-all animate-bounce ${toastMessage.type === 'success'
+                        ? 'bg-emerald-950 border border-emerald-500 text-emerald-200'
+                        : 'bg-rose-950 border border-rose-500 text-rose-200'
+                        }`}
                 >
                     {toastMessage.type === 'success' ? (
                         <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
@@ -290,11 +289,10 @@ export default function AdminMembershipsPage() {
                     <button
                         type="button"
                         onClick={() => setActiveTab('AGENT')}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition cursor-pointer flex items-center gap-2 ${
-                            activeTab === 'AGENT'
-                                ? 'bg-blue-600 text-white'
-                                : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition cursor-pointer flex items-center gap-2 ${activeTab === 'AGENT'
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
+                            }`}
                     >
                         <Shield size={16} />
                         Agent Memberships ({agentPlans.length})
@@ -303,11 +301,10 @@ export default function AdminMembershipsPage() {
                     <button
                         type="button"
                         onClick={() => setActiveTab('ADMIN')}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition cursor-pointer flex items-center gap-2 ${
-                            activeTab === 'ADMIN'
-                                ? 'bg-amber-600 text-white'
-                                : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition cursor-pointer flex items-center gap-2 ${activeTab === 'ADMIN'
+                            ? 'bg-amber-600 text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
+                            }`}
                     >
                         <Sparkles size={16} />
                         Admin Premiums ({adminPlans.length})
@@ -316,11 +313,10 @@ export default function AdminMembershipsPage() {
                     <button
                         type="button"
                         onClick={() => setActiveTab('SUBSCRIPTIONS')}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition cursor-pointer flex items-center gap-2 ${
-                            activeTab === 'SUBSCRIPTIONS'
-                                ? 'bg-indigo-600 text-white'
-                                : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition cursor-pointer flex items-center gap-2 ${activeTab === 'SUBSCRIPTIONS'
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
+                            }`}
                     >
                         <Users size={16} />
                         Active Subscriptions ({subscriptions.length})
@@ -333,20 +329,18 @@ export default function AdminMembershipsPage() {
                         {(activeTab === 'AGENT' ? agentPlans : adminPlans).map(plan => (
                             <div
                                 key={plan.id}
-                                className={`bg-gray-900 border rounded-2xl p-6 flex flex-col justify-between transition-all relative overflow-hidden ${
-                                    plan.is_active
-                                        ? 'border-gray-800 hover:border-gray-700 shadow-xl'
-                                        : 'border-gray-800/50 opacity-60'
-                                }`}
+                                className={`bg-gray-900 border rounded-2xl p-6 flex flex-col justify-between transition-all relative overflow-hidden ${plan.is_active
+                                    ? 'border-gray-800 hover:border-gray-700 shadow-xl'
+                                    : 'border-gray-800/50 opacity-60'
+                                    }`}
                             >
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <span
-                                            className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
-                                                plan.plan_type === 'AGENT'
-                                                    ? 'bg-blue-950/80 text-blue-300 border-blue-800'
-                                                    : 'bg-amber-950/80 text-amber-300 border-amber-800'
-                                            }`}
+                                            className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${plan.plan_type === 'AGENT'
+                                                ? 'bg-blue-950/80 text-blue-300 border-blue-800'
+                                                : 'bg-amber-950/80 text-amber-300 border-amber-800'
+                                                }`}
                                         >
                                             {plan.plan_type === 'AGENT' ? 'Agent Membership' : 'Admin Premium Only'}
                                         </span>
@@ -354,11 +348,10 @@ export default function AdminMembershipsPage() {
                                         <button
                                             type="button"
                                             onClick={() => handleTogglePlan(plan)}
-                                            className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
-                                                plan.is_active
-                                                    ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                                                    : 'bg-gray-800 text-gray-400 border border-gray-700'
-                                            }`}
+                                            className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${plan.is_active
+                                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                                : 'bg-gray-800 text-gray-400 border border-gray-700'
+                                                }`}
                                         >
                                             {plan.is_active ? 'Active' : 'Disabled'}
                                         </button>
@@ -463,11 +456,10 @@ export default function AdminMembershipsPage() {
                                             </td>
                                             <td className="py-4 px-6">
                                                 <span
-                                                    className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                                                        sub.is_valid
-                                                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                                                            : 'bg-rose-950 text-rose-300 border border-rose-800'
-                                                    }`}
+                                                    className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${sub.is_valid
+                                                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                                        : 'bg-rose-950 text-rose-300 border border-rose-800'
+                                                        }`}
                                                 >
                                                     {sub.status}
                                                 </span>
@@ -524,11 +516,10 @@ export default function AdminMembershipsPage() {
                                     <button
                                         type="button"
                                         onClick={() => setPlanForm(p => ({ ...p, plan_type: 'AGENT' }))}
-                                        className={`p-3 rounded-xl border text-left cursor-pointer transition ${
-                                            planForm.plan_type === 'AGENT'
-                                                ? 'bg-blue-950/60 border-blue-500 text-white'
-                                                : 'bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-700'
-                                        }`}
+                                        className={`p-3 rounded-xl border text-left cursor-pointer transition ${planForm.plan_type === 'AGENT'
+                                            ? 'bg-blue-950/60 border-blue-500 text-white'
+                                            : 'bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-700'
+                                            }`}
                                     >
                                         <div className="font-bold text-sm">Agent Membership</div>
                                         <div className="text-[11px] text-gray-400 mt-0.5">
@@ -539,11 +530,10 @@ export default function AdminMembershipsPage() {
                                     <button
                                         type="button"
                                         onClick={() => setPlanForm(p => ({ ...p, plan_type: 'ADMIN' }))}
-                                        className={`p-3 rounded-xl border text-left cursor-pointer transition ${
-                                            planForm.plan_type === 'ADMIN'
-                                                ? 'bg-amber-950/60 border-amber-500 text-white'
-                                                : 'bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-700'
-                                        }`}
+                                        className={`p-3 rounded-xl border text-left cursor-pointer transition ${planForm.plan_type === 'ADMIN'
+                                            ? 'bg-amber-950/60 border-amber-500 text-white'
+                                            : 'bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-700'
+                                            }`}
                                     >
                                         <div className="font-bold text-sm">Admin Premium</div>
                                         <div className="text-[11px] text-amber-400/80 mt-0.5">

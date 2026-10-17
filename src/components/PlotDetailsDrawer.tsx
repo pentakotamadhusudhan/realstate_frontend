@@ -148,7 +148,7 @@ export default function PlotDetailsDrawer() {
   const [holding, setHolding] = useState(false);
   const [holdSuccess, setHoldSuccess] = useState(false);
   const [holdError, setHoldError] = useState('');
-  
+
   // Call Query State
   const [showCallDialog, setShowCallDialog] = useState(false);
   const user = getUserProfile();
@@ -249,7 +249,7 @@ export default function PlotDetailsDrawer() {
     setHoldSuccess(false);
 
     try {
-      await apiFetch('http://172.20.10.2:8000//holds/', {
+      await apiFetch('http://192.168.43.66:8000//holds/', {
         method: 'POST',
         body: JSON.stringify({
           plot_id: plot.id,

@@ -80,7 +80,7 @@ export default function AdminAgentsPage() {
             }
 
             const rawList: AgentUser[] = Array.isArray(data) ? data : data?.results || [];
-            
+
             // Normalize agent properties
             const normalized = rawList.map((a: any) => ({
                 id: String(a.id),
@@ -263,18 +263,17 @@ export default function AdminAgentsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col font-sans">
+        <div className=" bg-gray-950 text-gray-100 flex flex-col font-sans">
             {/* Top Navigation */}
             <AdminNavbar pendingAgentsCount={unverifiedCount} />
 
             {/* Notification Toast */}
             {toastMessage && (
                 <div
-                    className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-semibold transition-all animate-bounce ${
-                        toastMessage.type === 'success'
-                            ? 'bg-emerald-950 border border-emerald-500 text-emerald-200'
-                            : 'bg-rose-950 border border-rose-500 text-rose-200'
-                    }`}
+                    className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-semibold transition-all animate-bounce ${toastMessage.type === 'success'
+                        ? 'bg-emerald-950 border border-emerald-500 text-emerald-200'
+                        : 'bg-rose-950 border border-rose-500 text-rose-200'
+                        }`}
                 >
                     {toastMessage.type === 'success' ? (
                         <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
@@ -343,11 +342,10 @@ export default function AdminAgentsPage() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div
                         onClick={() => setActiveTab('ALL')}
-                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${
-                            activeTab === 'ALL'
-                                ? 'border-blue-500/60 bg-blue-950/20 shadow-lg shadow-blue-500/5'
-                                : 'border-gray-800 hover:border-gray-700'
-                        }`}
+                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${activeTab === 'ALL'
+                            ? 'border-blue-500/60 bg-blue-950/20 shadow-lg shadow-blue-500/5'
+                            : 'border-gray-800 hover:border-gray-700'
+                            }`}
                     >
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Agents</span>
@@ -363,11 +361,10 @@ export default function AdminAgentsPage() {
 
                     <div
                         onClick={() => setActiveTab('UNVERIFIED')}
-                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${
-                            activeTab === 'UNVERIFIED'
-                                ? 'border-amber-500 bg-amber-950/20 shadow-lg shadow-amber-500/5'
-                                : 'border-gray-800 hover:border-gray-700'
-                        }`}
+                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${activeTab === 'UNVERIFIED'
+                            ? 'border-amber-500 bg-amber-950/20 shadow-lg shadow-amber-500/5'
+                            : 'border-gray-800 hover:border-gray-700'
+                            }`}
                     >
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
@@ -388,11 +385,10 @@ export default function AdminAgentsPage() {
 
                     <div
                         onClick={() => setActiveTab('VERIFIED')}
-                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${
-                            activeTab === 'VERIFIED'
-                                ? 'border-emerald-500 bg-emerald-950/20 shadow-lg shadow-emerald-500/5'
-                                : 'border-gray-800 hover:border-gray-700'
-                        }`}
+                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${activeTab === 'VERIFIED'
+                            ? 'border-emerald-500 bg-emerald-950/20 shadow-lg shadow-emerald-500/5'
+                            : 'border-gray-800 hover:border-gray-700'
+                            }`}
                     >
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Verified</span>
@@ -408,11 +404,10 @@ export default function AdminAgentsPage() {
 
                     <div
                         onClick={() => setActiveTab('BLOCKED')}
-                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${
-                            activeTab === 'BLOCKED'
-                                ? 'border-rose-500 bg-rose-950/20 shadow-lg shadow-rose-500/5'
-                                : 'border-gray-800 hover:border-gray-700'
-                        }`}
+                        className={`bg-gray-900 border p-5 rounded-2xl cursor-pointer transition ${activeTab === 'BLOCKED'
+                            ? 'border-rose-500 bg-rose-950/20 shadow-lg shadow-rose-500/5'
+                            : 'border-gray-800 hover:border-gray-700'
+                            }`}
                     >
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-rose-400">Blocked</span>
@@ -434,11 +429,10 @@ export default function AdminAgentsPage() {
                         <button
                             type="button"
                             onClick={() => setActiveTab('ALL')}
-                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap ${
-                                activeTab === 'ALL'
-                                    ? 'bg-blue-600 text-white shadow-sm'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
-                            }`}
+                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap ${activeTab === 'ALL'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
+                                }`}
                         >
                             All Agents ({agents.length})
                         </button>
@@ -446,11 +440,10 @@ export default function AdminAgentsPage() {
                         <button
                             type="button"
                             onClick={() => setActiveTab('UNVERIFIED')}
-                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-                                activeTab === 'UNVERIFIED'
-                                    ? 'bg-amber-500 text-gray-950 shadow-sm'
-                                    : 'text-amber-400/90 hover:text-amber-300 hover:bg-gray-800/60'
-                            }`}
+                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-2 ${activeTab === 'UNVERIFIED'
+                                ? 'bg-amber-500 text-gray-950 shadow-sm'
+                                : 'text-amber-400/90 hover:text-amber-300 hover:bg-gray-800/60'
+                                }`}
                         >
                             <Clock size={14} />
                             Pending Verification ({unverifiedCount})
@@ -459,11 +452,10 @@ export default function AdminAgentsPage() {
                         <button
                             type="button"
                             onClick={() => setActiveTab('VERIFIED')}
-                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-                                activeTab === 'VERIFIED'
-                                    ? 'bg-emerald-600 text-white shadow-sm'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
-                            }`}
+                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-2 ${activeTab === 'VERIFIED'
+                                ? 'bg-emerald-600 text-white shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
+                                }`}
                         >
                             <ShieldCheck size={14} />
                             Verified ({verifiedCount})
@@ -472,11 +464,10 @@ export default function AdminAgentsPage() {
                         <button
                             type="button"
                             onClick={() => setActiveTab('BLOCKED')}
-                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-                                activeTab === 'BLOCKED'
-                                    ? 'bg-rose-600 text-white shadow-sm'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
-                            }`}
+                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-2 ${activeTab === 'BLOCKED'
+                                ? 'bg-rose-600 text-white shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
+                                }`}
                         >
                             <Ban size={14} />
                             Blocked ({blockedCount})
@@ -526,8 +517,8 @@ export default function AdminAgentsPage() {
                                 {searchQuery
                                     ? `No agent matches "${searchQuery}". Try a different keyword.`
                                     : activeTab === 'UNVERIFIED'
-                                    ? 'No agents currently waiting for verification. All clear!'
-                                    : 'No agents registered under this category yet.'}
+                                        ? 'No agents currently waiting for verification. All clear!'
+                                        : 'No agents registered under this category yet.'}
                             </p>
                             {searchQuery && (
                                 <button
@@ -757,20 +748,18 @@ export default function AdminAgentsPage() {
                                 </p>
                                 <div className="flex items-center gap-2 mt-2">
                                     <span
-                                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold border ${
-                                            selectedAgent.is_verified
-                                                ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
-                                                : 'bg-amber-950 text-amber-300 border-amber-800'
-                                        }`}
+                                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold border ${selectedAgent.is_verified
+                                            ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
+                                            : 'bg-amber-950 text-amber-300 border-amber-800'
+                                            }`}
                                     >
                                         {selectedAgent.is_verified ? 'Verified Agent' : 'Verification Pending'}
                                     </span>
                                     <span
-                                        className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${
-                                            selectedAgent.is_active !== false
-                                                ? 'bg-gray-800 text-gray-300 border-gray-700'
-                                                : 'bg-rose-950 text-rose-300 border-rose-800'
-                                        }`}
+                                        className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${selectedAgent.is_active !== false
+                                            ? 'bg-gray-800 text-gray-300 border-gray-700'
+                                            : 'bg-rose-950 text-rose-300 border-rose-800'
+                                            }`}
                                     >
                                         {selectedAgent.is_active !== false ? 'Active' : 'Blocked'}
                                     </span>
@@ -896,11 +885,10 @@ export default function AdminAgentsPage() {
                         onClick={e => e.stopPropagation()}
                     >
                         <div
-                            className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${
-                                confirmModal.type === 'VERIFY'
-                                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                                    : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-                            }`}
+                            className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${confirmModal.type === 'VERIFY'
+                                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                                }`}
                         >
                             {confirmModal.type === 'VERIFY' ? (
                                 <ShieldCheck size={24} />
@@ -913,16 +901,16 @@ export default function AdminAgentsPage() {
                             {confirmModal.type === 'VERIFY'
                                 ? `Verify "${confirmModal.agent.full_name}"?`
                                 : confirmModal.type === 'BLOCK'
-                                ? `Block "${confirmModal.agent.full_name}"?`
-                                : `Unblock "${confirmModal.agent.full_name}"?`}
+                                    ? `Block "${confirmModal.agent.full_name}"?`
+                                    : `Unblock "${confirmModal.agent.full_name}"?`}
                         </h3>
 
                         <p className="text-sm text-gray-400 mt-2 leading-relaxed">
                             {confirmModal.type === 'VERIFY'
                                 ? 'Approving this agent marks their KYC as verified and enables full dashboard capabilities according to their membership plan.'
                                 : confirmModal.type === 'BLOCK'
-                                ? 'Blocking this agent will immediately revoke their ability to access listings, post plots, or receive inquiries.'
-                                : 'Unblocking will restore their account access and active status.'}
+                                    ? 'Blocking this agent will immediately revoke their ability to access listings, post plots, or receive inquiries.'
+                                    : 'Unblocking will restore their account access and active status.'}
                         </p>
 
                         <div className="mt-6 flex items-center justify-end gap-3">
@@ -946,11 +934,10 @@ export default function AdminAgentsPage() {
                                         handleReactivateAgent(confirmModal.agent!);
                                     }
                                 }}
-                                className={`px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-lg cursor-pointer disabled:opacity-50 ${
-                                    confirmModal.type === 'VERIFY'
-                                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
-                                        : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/20'
-                                }`}
+                                className={`px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-lg cursor-pointer disabled:opacity-50 ${confirmModal.type === 'VERIFY'
+                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                                    : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/20'
+                                    }`}
                             >
                                 {actionLoadingId ? (
                                     <RefreshCw size={16} className="animate-spin inline" />
