@@ -4,6 +4,7 @@ import { logout, getUserProfile, isSuperAdmin, isAdmin, isAgent } from '../../li
 import { apiFetch, ENDPOINTS } from '../../lib/api';
 import {
     Building2,
+    Building,
     Users,
     LogOut,
     CheckSquare,
@@ -12,7 +13,8 @@ import {
     Sparkles,
     Phone,
     CreditCard,
-    Clock
+    Clock,
+    Image as ImageIcon
 } from 'lucide-react';
 
 interface AdminNavbarProps {
@@ -27,10 +29,12 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
     const [pendingApprovals, setPendingApprovals] = useState(0);
 
     const isVenturesActive = location.pathname.startsWith('/admin/ventures');
+    const isApartmentsActive = location.pathname.startsWith('/admin/apartments');
     const isAgentsActive = location.pathname.startsWith('/admin/agents');
     const isApprovalsActive = location.pathname.startsWith('/admin/approvals');
     const isMembershipsActive = location.pathname.startsWith('/admin/memberships');
     const isQueriesActive = location.pathname.startsWith('/admin/queries');
+    const isBannersActive = location.pathname.startsWith('/admin/banners');
 
     useEffect(() => {
         // Fetch badge counts safely with silent: true
@@ -40,7 +44,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                     const list = Array.isArray(data) ? data : data?.results || [];
                     setPendingApprovals(list.length);
                 })
-                .catch(() => {});
+                .catch(() => { });
         }
 
         if (isSuperAdmin(user)) {
@@ -49,7 +53,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                     const list = Array.isArray(data) ? data : data?.results || [];
                     setPendingAgents(list.length);
                 })
-                .catch(() => {});
+                .catch(() => { });
         }
     }, []);
 
@@ -80,14 +84,26 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                         <button
                             type="button"
                             onClick={() => navigate('/admin/ventures')}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
-                                isVenturesActive
-                                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
-                                    : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
-                            }`}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isVenturesActive
+                                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
+                                : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
+                                }`}
                         >
                             <Building2 size={15} />
                             Ventures
+                        </button>
+
+                        {/* Apartments Management */}
+                        <button
+                            type="button"
+                            onClick={() => navigate('/admin/apartments')}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isApartmentsActive
+                                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
+                                : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
+                                }`}
+                        >
+                            <Building size={15} />
+                            Apartments
                         </button>
 
                         {/* Super Admin / Admin Approvals (Drafts to Public) */}
@@ -95,11 +111,10 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                             <button
                                 type="button"
                                 onClick={() => navigate('/admin/approvals')}
-                                className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
-                                    isApprovalsActive
-                                        ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
-                                }`}
+                                className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isApprovalsActive
+                                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
+                                    : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
+                                    }`}
                             >
                                 <CheckSquare size={15} />
                                 Approvals
@@ -116,11 +131,10 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                             <button
                                 type="button"
                                 onClick={() => navigate('/admin/agents')}
-                                className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
-                                    isAgentsActive
-                                        ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
-                                }`}
+                                className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isAgentsActive
+                                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
+                                    : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
+                                    }`}
                             >
                                 <Users size={15} />
                                 Agents
@@ -136,11 +150,10 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                         <button
                             type="button"
                             onClick={() => navigate('/admin/memberships')}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
-                                isMembershipsActive
-                                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
-                                    : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
-                            }`}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isMembershipsActive
+                                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
+                                : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
+                                }`}
                         >
                             <CreditCard size={15} />
                             Memberships
@@ -150,27 +163,39 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                         <button
                             type="button"
                             onClick={() => navigate('/admin/queries')}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
-                                isQueriesActive
-                                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
-                                    : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
-                            }`}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isQueriesActive
+                                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
+                                : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
+                                }`}
                         >
                             <Phone size={15} />
                             Call Queries
+                        </button>
+
+                        {/* Ad Banners */}
+                        <button
+                            type="button"
+                            onClick={() => navigate('/admin/banners')}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isBannersActive
+                                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
+                                : 'text-gray-300 hover:text-white hover:bg-gray-800/70'
+                                }`}
+                        >
+                            <ImageIcon size={15} />
+                            Ad Banners
                         </button>
                     </nav>
                 </div>
 
                 {/* Right Actions & Profile */}
                 <div className="flex items-center gap-3">
-                    <a
+                    {/* <a
                         href="/admin/ventures/create"
                         className="hidden sm:inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-sm transition cursor-pointer"
                     >
                         <PlusCircle size={14} />
                         New Venture
-                    </a>
+                    </a> */}
 
                     <div className="h-5 w-[1px] bg-gray-800 mx-1 hidden sm:block" />
 
@@ -195,7 +220,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                         title="Sign out"
                     >
                         <LogOut size={15} />
-                        <span className="hidden sm:inline">Logout</span>
+                        <span className="hidden sm:inline"></span>
                     </button>
                 </div>
             </div>
@@ -205,21 +230,29 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                 <button
                     type="button"
                     onClick={() => navigate('/admin/ventures')}
-                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${
-                        isVenturesActive ? 'bg-blue-600 text-white' : 'text-gray-400'
-                    }`}
+                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isVenturesActive ? 'bg-blue-600 text-white' : 'text-gray-400'
+                        }`}
                 >
                     <Building2 size={13} />
                     Ventures
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => navigate('/admin/apartments')}
+                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isApartmentsActive ? 'bg-blue-600 text-white' : 'text-gray-400'
+                        }`}
+                >
+                    <Building size={13} />
+                    Apartments
                 </button>
 
                 {isAdmin(user) && (
                     <button
                         type="button"
                         onClick={() => navigate('/admin/approvals')}
-                        className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${
-                            isApprovalsActive ? 'bg-blue-600 text-white' : 'text-gray-400'
-                        }`}
+                        className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isApprovalsActive ? 'bg-blue-600 text-white' : 'text-gray-400'
+                            }`}
                     >
                         <CheckSquare size={13} />
                         Approvals
@@ -235,9 +268,8 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                     <button
                         type="button"
                         onClick={() => navigate('/admin/agents')}
-                        className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${
-                            isAgentsActive ? 'bg-blue-600 text-white' : 'text-gray-400'
-                        }`}
+                        className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isAgentsActive ? 'bg-blue-600 text-white' : 'text-gray-400'
+                            }`}
                     >
                         <Users size={13} />
                         Agents
@@ -252,9 +284,8 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                 <button
                     type="button"
                     onClick={() => navigate('/admin/memberships')}
-                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${
-                        isMembershipsActive ? 'bg-blue-600 text-white' : 'text-gray-400'
-                    }`}
+                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isMembershipsActive ? 'bg-blue-600 text-white' : 'text-gray-400'
+                        }`}
                 >
                     <CreditCard size={13} />
                     Plans
@@ -263,12 +294,21 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                 <button
                     type="button"
                     onClick={() => navigate('/admin/queries')}
-                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${
-                        isQueriesActive ? 'bg-blue-600 text-white' : 'text-gray-400'
-                    }`}
+                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isQueriesActive ? 'bg-blue-600 text-white' : 'text-gray-400'
+                        }`}
                 >
                     <Phone size={13} />
                     Leads
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => navigate('/admin/banners')}
+                    className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isBannersActive ? 'bg-blue-600 text-white' : 'text-gray-400'
+                        }`}
+                >
+                    <ImageIcon size={13} />
+                    Banners
                 </button>
             </div>
         </header>

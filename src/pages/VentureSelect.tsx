@@ -5,11 +5,12 @@ import { logout } from '../lib/auth'
 import ApiErrorAlert from '../components/alter_box/ApiErrorAlert'
 import { formatApiErrorMessage } from '../utils/formatApiError'
 import {
-    MapPin, Home, ChevronRight, Info, Building2, ChevronLeft,
+    MapPin, Home, ChevronRight, Info, Building2, Building, ChevronLeft,
     Clock, LogOut, Search, Bell, Sparkles, TrendingUp,
-    ShieldCheck, Wallet, Landmark, ArrowUpRight, Compass
+    ShieldCheck, ArrowUpRight, Compass
 } from 'lucide-react'
 import logo from "../assets/logomain.png";
+import HeroAdBanner from '../components/HeroAdBanner';
 
 interface Venture {
     id: string
@@ -25,56 +26,10 @@ interface Venture {
     amenities: string[]
 }
 
-const BANNERS = [
-    {
-        id: 1,
-        title: 'Premium Plots Starting at ₹25 Lakhs',
-        subtitle: 'Book now and unlock an early-bird discount of 10%',
-        bg: 'linear-gradient(135deg, #0b1220 0%, #0f2040 40%, #1e40af 100%)',
-        glow: 'radial-gradient(circle at 80% 20%, rgba(59,130,246,0.35), transparent 60%)',
-        badge: '🔥 Limited Offer',
-        icon: Sparkles,
-        cta: 'Book Now',
-        image: "https://premiumplotsnagpur.com/plots/img/banner_estate.webp"
-    },
-    {
-        id: 2,
-        title: 'GVMC Approved Layouts',
-        subtitle: 'Legally verified plots with 100% clear titles',
-        bg: 'linear-gradient(135deg, #041e17 0%, #064e3b 50%, #059669 100%)',
-        glow: 'radial-gradient(circle at 20% 30%, rgba(16,185,129,0.4), transparent 55%)',
-        badge: '✅ 100% Legal',
-        icon: ShieldCheck,
-        cta: 'Learn More',
-        image: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.leYTgOQKaX2tfE4ZToe0fAHaEK%3Fr%3D0%26pid%3DApi&f=1&ipt=b43588754e16c59175ea9b16e5dd0c11831aa8bc24628fb8a79f6e6c496741d3&ipo=images'
-    },
-    {
-        id: 3,
-        title: 'Zero GST on Registration',
-        subtitle: 'Save up to ₹2 Lakhs on registration charges',
-        bg: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #7c3aed 100%)',
-        glow: 'radial-gradient(circle at 70% 70%, rgba(167,139,250,0.35), transparent 60%)',
-        badge: '💰 Save More',
-        icon: Wallet,
-        cta: 'View Offer',
-        image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.tR9bK1q3Z5iiM2ykbdeXXgHaEK%3Fr%3D0%26pid%3DApi&f=1&ipt=500e28cdb26c747c7b6024270c46489566acd2d9dec7d675a97835027c8788f8&ipo=images"
-    },
-    {
-        id: 4,
-        title: 'Bank Loans Available',
-        subtitle: 'Easy EMI options with all leading banks',
-        bg: 'linear-gradient(135deg, #431407 0%, #9a3412 50%, #ea580c 100%)',
-        glow: 'radial-gradient(circle at 30% 60%, rgba(251,146,60,0.4), transparent 55%)',
-        badge: '🏦 Easy Finance',
-        icon: Landmark,
-        cta: 'Apply Now',
-        image: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.JQkTbZrIFIIG86jQ_uk1RAHaD9%3Fr%3D0%26pid%3DApi&f=1&ipt=e911ff1fc15c6ea72ed112db90b20c8ee67a690ffdd9e97db758a93ffcec5b1c&ipo=images'
-    },
-]
-
 const NAV = [
     { label: 'Home', icon: Home, path: '/ventures' },
     { label: 'Ventures', icon: Building2, path: '/ventures' },
+    { label: 'Apartments', icon: Building, path: '/apartments' },
     { label: 'My Holds', icon: Clock, path: '/my-holds' },
     { label: 'About Us', icon: Info, path: null },
 ]
@@ -145,20 +100,8 @@ export default function VentureSelect() {
     const [ventures, setVentures] = useState<Venture[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
-    const [currentBanner, setCurrentBanner] = useState(0)
     const [query, setQuery] = useState('')
-    const bannerTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const navigate = useNavigate()
-
-    // Auto-advance banner
-    useEffect(() => {
-        bannerTimerRef.current = setInterval(() => {
-            setCurrentBanner(p => (p + 1) % BANNERS.length)
-        }, 5000)
-        return () => {
-            if (bannerTimerRef.current) clearInterval(bannerTimerRef.current)
-        }
-    }, [])
 
     async function fetchVentures() {
         setLoading(true)
@@ -183,28 +126,10 @@ export default function VentureSelect() {
         navigate('/dashboard')
     }
 
-    function resetTimer() {
-        if (bannerTimerRef.current) clearInterval(bannerTimerRef.current)
-        bannerTimerRef.current = setInterval(() => {
-            setCurrentBanner(p => (p + 1) % BANNERS.length)
-        }, 5000)
-    }
-
-    const prevBanner = () => {
-        resetTimer()
-        setCurrentBanner(p => (p - 1 + BANNERS.length) % BANNERS.length)
-    }
-
-    const nextBanner = () => {
-        resetTimer()
-        setCurrentBanner(p => (p + 1) % BANNERS.length)
-    }
-
     const user = useMemo(
         () => JSON.parse(localStorage.getItem('user_profile') || '{}'),
         []
     )
-    const banner = BANNERS[currentBanner]
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase()
@@ -344,142 +269,7 @@ export default function VentureSelect() {
                 </header>
 
                 {/* ═══════ HERO BANNER ═══════ */}
-                <section className="px-4 sm:px-6 lg:px-8 pt-3">
-                    <div className="mx-auto max-w-7xl">
-                        <div
-                            className="relative overflow-hidden rounded-3xl border border-white/10 flex flex-col justify-between"
-                            style={{ height: 280, boxShadow: '0 30px 60px -30px rgba(15,32,64,0.6)' }}
-                        >
-                            {/* ── Background image layers (cross-fade + Ken Burns) ── */}
-                            {BANNERS.map((b, i) => (
-                                <div
-                                    key={b.id}
-                                    className="absolute inset-0"
-                                    style={{
-                                        opacity: i === currentBanner ? 1 : 0,
-                                        // Fixed: Changed single quotes to backticks for template literal evaluation
-                                        backgroundImage: `url(${b.image})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
-                                        transform: i === currentBanner ? 'scale(1.05)' : 'scale(1)',
-                                        transition: 'opacity 1s ease, transform 8s ease-out',
-                                    }}
-                                />
-                            ))}
-
-                            {/* ── Colored overlay scrim ── */}
-                            <div
-                                className="absolute inset-0 transition-all duration-700 pointer-events-none"
-                                style={{ background: (banner as any).overlay || banner.bg }}
-                            />
-
-                            {/* ── Radial glow accent ── */}
-                            <div
-                                className="absolute inset-0 transition-all duration-700 pointer-events-none"
-                                style={{ background: banner.glow }}
-                            />
-
-                            {/* ── Bottom gradient fade so text & controls stay legible ── */}
-                            <div
-                                className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none z-10"
-                                style={{
-                                    background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)',
-                                }}
-                            />
-
-                            {/* ── Banner Content (Positioned relative & z-20 to sit above backgrounds) ── */}
-                            <div className="relative z-20 flex-1 flex flex-col justify-center text-center px-12 sm:px-16 pt-6">
-                                <span
-                                    className="inline-block self-center text-xs font-semibold px-3 py-1 rounded-full mb-2"
-                                    style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)' }}
-                                >
-                                    {banner.badge}
-                                </span>
-                                <h2
-                                    className="text-xl sm:text-2xl font-bold text-white mb-1"
-                                    style={{ letterSpacing: '-0.02em', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}
-                                >
-                                    {banner.title}
-                                </h2>
-                                <p style={{ color: 'rgba(255,255,255,0.85)' }} className="text-xs sm:text-sm max-w-xl mx-auto">
-                                    {banner.subtitle}
-                                </p>
-                            </div>
-
-                            {/* ═══ Left Navigation Arrow ═══ */}
-                            <button
-                                onClick={prevBanner}
-                                aria-label="Previous"
-                                className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full flex items-center justify-center transition hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-                                style={{
-                                    background: 'rgba(255,255,255,0.12)',
-                                    backdropFilter: 'blur(12px)',
-                                    border: '1px solid rgba(255,255,255,0.15)',
-                                }}
-                            >
-                                <ChevronLeft size={18} color="white" />
-                            </button>
-
-                            {/* ═══ Right Navigation Arrow ═══ */}
-                            <button
-                                onClick={nextBanner}
-                                aria-label="Next"
-                                className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full flex items-center justify-center transition hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-                                style={{
-                                    background: 'rgba(255,255,255,0.12)',
-                                    backdropFilter: 'blur(12px)',
-                                    border: '1px solid rgba(255,255,255,0.15)',
-                                }}
-                            >
-                                <ChevronRight size={18} color="white" />
-                            </button>
-
-                            {/* ═══ Bottom Controls Bar (Dots left, CTA right) ═══ */}
-                            <div className="relative z-30 px-6 pb-5 flex items-center justify-between">
-                                {/* Dot indicators */}
-                                <div className="flex items-center gap-1.5">
-                                    {BANNERS.map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => {
-                                                resetTimer();
-                                                setCurrentBanner(i);
-                                            }}
-                                            aria-label={`Go to slide ${i + 1}`}
-                                            className="rounded-full transition-all duration-300"
-                                            style={{
-                                                width: i === currentBanner ? 24 : 6,
-                                                height: 6,
-                                                background: i === currentBanner ? 'white' : 'rgba(255,255,255,0.5)',
-                                                boxShadow: i === currentBanner ? '0 0 10px rgba(255,255,255,0.6)' : 'none',
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-
-                                {/* Bottom-right CTA Button */}
-                                <button
-                                    className="group inline-flex items-center gap-2 pl-4 pr-3 py-2 rounded-full text-xs sm:text-sm font-semibold transition active:scale-95 hover:shadow-2xl"
-                                    style={{
-                                        background: 'rgba(255,255,255,0.97)',
-                                        color: '#0f172a',
-                                        boxShadow: '0 8px 24px -8px rgba(255,255,255,0.4), 0 4px 12px rgba(0,0,0,0.25)',
-                                        backdropFilter: 'blur(8px)',
-                                    }}
-                                >
-                                    <banner.icon size={14} />
-                                    {banner.cta}
-                                    <span
-                                        className="ml-1 w-5 h-5 rounded-full flex items-center justify-center transition group-hover:translate-x-0.5"
-                                        style={{ background: 'rgba(15,23,42,0.08)' }}
-                                    >
-                                        <ArrowUpRight size={12} />
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <HeroAdBanner />
 
                 {/* ═══════ MAIN ═══════ */}
                 <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8">

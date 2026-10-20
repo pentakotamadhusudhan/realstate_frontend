@@ -200,7 +200,7 @@ export default function PlotDetailsDrawer() {
             const v = JSON.parse(stored);
             ventureId = v.id;
           }
-        } catch {}
+        } catch { }
       }
 
       const payload = {
@@ -249,7 +249,7 @@ export default function PlotDetailsDrawer() {
     setHoldSuccess(false);
 
     try {
-      await apiFetch('http://192.168.43.66:8000//holds/', {
+      await apiFetch('http://192.168.0.202:8000//holds/', {
         method: 'POST',
         body: JSON.stringify({
           plot_id: plot.id,

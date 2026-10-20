@@ -2,8 +2,8 @@ export const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ||
     (typeof window !== 'undefined' &&
         (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://192.168.43.66:8000/api'
-        : 'http://192.168.43.66:8000/api')
+        ? 'http://192.168.0.202:8000/api'
+        : 'http://192.168.0.202:8000/api')
 
 export const ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login/`,
@@ -40,6 +40,28 @@ export const ENDPOINTS = {
     callQueries: (params?: string) =>
         `${API_BASE_URL}/call-queries/${params ? `?${params}` : ''}`,
     callQueryDetail: (id: string) => `${API_BASE_URL}/call-queries/${id}/`,
+    adBanners: (params?: string) =>
+        `${API_BASE_URL}/ad-banners/${params ? `?${params}` : ''}`,
+    adBannerDetail: (id: string | number) => `${API_BASE_URL}/ad-banners/${id}/`,
+    authAdBanners: (params?: string) =>
+        `${API_BASE_URL}/auth/ad-banners/${params ? `?${params}` : ''}`,
+    authAdBannerDetail: (id: string | number) => `${API_BASE_URL}/auth/ad-banners/${id}/`,
+
+    // Apartments & Flats endpoints
+    apartments: (params?: string) =>
+        `${API_BASE_URL}/apartments/${params ? `?${params}` : ''}`,
+    apartmentDetail: (id: string) => `${API_BASE_URL}/apartments/${id}/`,
+    apartmentFlats: (id: string, params?: string) =>
+        `${API_BASE_URL}/apartments/${id}/flats/${params ? `?${params}` : ''}`,
+    apartmentFlatsBulkCreate: (id: string) =>
+        `${API_BASE_URL}/apartments/${id}/flats/bulk-create/`,
+    apartmentMedia: (id: string) => `${API_BASE_URL}/apartments/${id}/media/`,
+    apartmentMediaDetail: (id: string) => `${API_BASE_URL}/apartments/media/${id}/`,
+    flats: (params?: string) =>
+        `${API_BASE_URL}/flats/${params ? `?${params}` : ''}`,
+    flatDetail: (id: string) => `${API_BASE_URL}/flats/${id}/`,
+    flatMedia: (id: string) => `${API_BASE_URL}/flats/${id}/media/`,
+    flatMediaDetail: (id: string) => `${API_BASE_URL}/flats/media/${id}/`,
 }
 
 export function saveTokens(access: string, refresh: string) {
@@ -78,8 +100,11 @@ export async function apiFetch(
     const { silent = false, ...fetchOptions } = options
 
     const headers: Record<string, string> = {
-        "Content-Type": "application/json",
         ...(fetchOptions.headers as Record<string, string>),
+    }
+
+    if (!(fetchOptions.body instanceof FormData) && !headers["Content-Type"]) {
+        headers["Content-Type"] = "application/json"
     }
 
     if (token) {

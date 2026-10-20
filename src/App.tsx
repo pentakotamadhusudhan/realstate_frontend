@@ -18,6 +18,10 @@ import AdminAgentsPage from './pages/admin/AdminAgentsPage'
 import AdminMembershipsPage from './pages/admin/AdminMembershipsPage'
 import AdminPlotApprovalsPage from './pages/admin/AdminPlotApprovalsPage'
 import AdminCallQueriesPage from './pages/admin/AdminCallQueriesPage'
+import AdminBannersPage from './pages/admin/AdminBannersPage'
+import AdminApartmentsPage from './pages/admin/AdminApartmentsPage'
+import AdminApartmentDetailPage from './pages/admin/AdminApartmentDetailPage'
+import CustomerApartmentsPage from './pages/CustomerApartmentsPage'
 import GlobalApiErrorContainer from './components/alter_box/GlobalApiErrorContainer'
 
 function App() {
@@ -35,6 +39,7 @@ function App() {
 
         {/* Customer protected */}
         <Route path="/ventures" element={<ProtectedRoute><VentureSelect /></ProtectedRoute>} />
+        <Route path="/apartments" element={<ProtectedRoute><CustomerApartmentsPage /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/my-holds" element={<ProtectedRoute><MyHolds /></ProtectedRoute>} />
 
@@ -44,10 +49,13 @@ function App() {
         <Route path="/admin/ventures" element={<ProtectedRoute><VentureList /></ProtectedRoute>} />
         <Route path="/admin/ventures/create" element={<ProtectedRoute><VentureCreate /></ProtectedRoute>} />
         <Route path="/admin/ventures/:slug/plots" element={<ProtectedRoute><VenturePlotUpload /></ProtectedRoute>} />
+        <Route path="/admin/apartments" element={<ProtectedRoute><AdminApartmentsPage /></ProtectedRoute>} />
+        <Route path="/admin/apartments/:id" element={<ProtectedRoute><AdminApartmentDetailPage /></ProtectedRoute>} />
         <Route path="/admin/agents" element={<ProtectedRoute><AdminAgentsPage /></ProtectedRoute>} />
         <Route path="/admin/memberships" element={<ProtectedRoute><AdminMembershipsPage /></ProtectedRoute>} />
         <Route path="/admin/approvals" element={<ProtectedRoute><AdminPlotApprovalsPage /></ProtectedRoute>} />
         <Route path="/admin/queries" element={<ProtectedRoute><AdminCallQueriesPage /></ProtectedRoute>} />
+        <Route path="/admin/banners" element={<ProtectedRoute><AdminBannersPage /></ProtectedRoute>} />
 
         {/* Agent Registration & Verification Status */}
         <Route path="/agent-register" element={<AgentRegisterPage />} />
