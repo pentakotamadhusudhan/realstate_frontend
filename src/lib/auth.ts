@@ -23,6 +23,9 @@ export interface UserProfile {
     is_active?: boolean;
     has_active_membership?: boolean;
     active_membership?: ActiveMembershipInfo | null;
+    has_lifetime_verification?: boolean;
+    is_onboarding_fee_paid?: boolean;
+    privacy_conceal_profile?: boolean;
     created_at?: string;
 }
 

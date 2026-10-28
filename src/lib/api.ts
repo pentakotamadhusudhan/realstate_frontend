@@ -2,8 +2,8 @@ export const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ||
     (typeof window !== 'undefined' &&
         (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://192.168.0.202:8000/api'
-        : 'http://192.168.0.202:8000/api')
+        ? 'http://10.233.153.102:8000/api'
+        : 'http://10.233.153.102:8000/api')
 
 export const ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login/`,
@@ -62,6 +62,43 @@ export const ENDPOINTS = {
     flatDetail: (id: string) => `${API_BASE_URL}/flats/${id}/`,
     flatMedia: (id: string) => `${API_BASE_URL}/flats/${id}/media/`,
     flatMediaDetail: (id: string) => `${API_BASE_URL}/flats/media/${id}/`,
+
+    // Revenue Generation Model & Super Admin Governance endpoints
+    revenueServices: (params?: string) =>
+        `${API_BASE_URL}/revenue/services/${params ? `?${params}` : ''}`,
+    revenueServiceToggle: (code: string) =>
+        `${API_BASE_URL}/revenue/services/${code}/`,
+    builderVerification: `${API_BASE_URL}/revenue/builder/verification/`,
+    superAdminVerifications: (params?: string) =>
+        `${API_BASE_URL}/revenue/super-admin/verifications/${params ? `?${params}` : ''}`,
+    superAdminVerificationReview: (id: string) =>
+        `${API_BASE_URL}/revenue/super-admin/verifications/${id}/review/`,
+    builderVentureAnalytics: (slug: string) =>
+        `${API_BASE_URL}/revenue/builder/ventures/${slug}/analytics/`,
+    logVisitorInteraction: `${API_BASE_URL}/revenue/analytics/log/`,
+    agentOnboardingFee: `${API_BASE_URL}/revenue/agent/onboarding-fee/pay/`,
+    agentLeadPackages: (params?: string) =>
+        `${API_BASE_URL}/revenue/agent/lead-packages/${params ? `?${params}` : ''}`,
+    agentPurchaseLeadPackage: (id: string) =>
+        `${API_BASE_URL}/revenue/agent/lead-packages/${id}/purchase/`,
+    agentLeadWallet: `${API_BASE_URL}/revenue/agent/wallet/`,
+    agentUnlockLead: (queryId: string) =>
+        `${API_BASE_URL}/revenue/agent/leads/${queryId}/unlock/`,
+    promotionalBanners: (params?: string) =>
+        `${API_BASE_URL}/revenue/promotions/banners/${params ? `?${params}` : ''}`,
+    promotionalBannerDetail: (id: string | number) =>
+        `${API_BASE_URL}/revenue/promotions/banners/${id}/`,
+    promotionalBannerClick: (id: string | number) =>
+        `${API_BASE_URL}/revenue/promotions/banners/${id}/click/`,
+    sponsoredVentures: (params?: string) =>
+        `${API_BASE_URL}/revenue/promotions/sponsored-ventures/${params ? `?${params}` : ''}`,
+    advancedVentureSearch: (params?: string) =>
+        `${API_BASE_URL}/revenue/search/ventures/${params ? `?${params}` : ''}`,
+    ventureProximity: (slug: string) =>
+        `${API_BASE_URL}/revenue/ventures/${slug}/proximity/`,
+    extendHold: (holdId: string) =>
+        `${API_BASE_URL}/revenue/holds/${holdId}/extend/`,
+    customerDataPrivacy: `${API_BASE_URL}/revenue/customer/data-privacy/toggle/`,
 }
 
 export function saveTokens(access: string, refresh: string) {

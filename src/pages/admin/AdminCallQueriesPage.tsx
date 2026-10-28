@@ -5,6 +5,7 @@ import AdminNavbar from '../../components/admin/AdminNavbar';
 import ApiErrorAlert from '../../components/alter_box/ApiErrorAlert';
 import { formatApiErrorMessage } from '../../utils/formatApiError';
 import { getUserProfile, isAgent } from '../../lib/auth';
+import AgentLeadWalletModal from '../../components/revenue/AgentLeadWalletModal';
 import {
     Phone,
     Mail,
@@ -20,7 +21,11 @@ import {
     Save,
     AlertCircle,
     Calendar,
-    Filter
+    Filter,
+    Wallet,
+    Lock,
+    Zap,
+    Unlock,
 } from 'lucide-react';
 
 export interface CallQueryRecord {
@@ -36,6 +41,7 @@ export interface CallQueryRecord {
     preferred_call_time?: string;
     status: 'PENDING' | 'CONTACTED' | 'RESOLVED' | 'CLOSED';
     notes?: string;
+    is_contact_masked?: boolean;
     created_at: string;
 }
 
@@ -52,10 +58,63 @@ export default function AdminCallQueriesPage() {
     const [editNotes, setEditNotes] = useState('');
     const [editStatus, setEditStatus] = useState<CallQueryRecord['status']>('CONTACTED');
 
+    // Agent Lead Wallet & Pay-Per-Lead state
+    const [walletCredits, setWalletCredits] = useState<number | null>(null);
+    const [showWalletModal, setShowWalletModal] = useState(false);
+    const [unlockingId, setUnlockingId] = useState<string | null>(null);
+
     useEffect(() => {
         document.body.classList.add('admin-page');
         return () => document.body.classList.remove('admin-page');
     }, []);
+
+    const fetchWallet = async () => {
+        try {
+            const data = await apiFetch(ENDPOINTS.agentLeadWallet, { silent: true });
+            if (data && typeof data.credits_balance === 'number') {
+                setWalletCredits(data.credits_balance);
+            }
+        } catch {
+            // Non-agent or disabled service
+        }
+    };
+
+    const handleUnlockLead = async (queryId: string) => {
+        setUnlockingId(queryId);
+        try {
+            const res = await apiFetch(ENDPOINTS.agentUnlockLead(queryId), {
+                method: 'POST',
+            });
+            const unlockedLead = res.lead;
+            if (unlockedLead) {
+                setQueries(prev =>
+                    prev.map(q =>
+                        q.id === queryId
+                            ? {
+                                  ...q,
+                                  customer_name: unlockedLead.customer_name,
+                                  customer_phone: unlockedLead.customer_phone,
+                                  customer_email: unlockedLead.customer_email,
+                                  is_contact_masked: false,
+                              }
+                            : q
+                    )
+                );
+                if (walletCredits !== null && walletCredits > 0) {
+                    setWalletCredits(prev => (prev !== null ? prev - 1 : 0));
+                }
+            }
+        } catch (err: any) {
+            const msg = formatApiErrorMessage(err);
+            if (msg.toLowerCase().includes('insufficient') || msg.toLowerCase().includes('credit')) {
+                setShowWalletModal(true);
+            } else {
+                alert(msg || 'Failed to unlock lead contact details.');
+            }
+        } finally {
+            setUnlockingId(null);
+        }
+    };
 
     const fetchQueries = async () => {
         setLoading(true);
@@ -75,6 +134,7 @@ export default function AdminCallQueriesPage() {
 
     useEffect(() => {
         fetchQueries();
+        fetchWallet();
     }, []);
 
     const handleUpdateStatus = async (queryId: string, newStatus: CallQueryRecord['status'], notes?: string) => {
@@ -143,7 +203,22 @@ export default function AdminCallQueriesPage() {
                     <div className="flex items-center gap-3">
                         <button
                             type="button"
-                            onClick={fetchQueries}
+                            onClick={() => setShowWalletModal(true)}
+                            className="px-3.5 py-2 bg-emerald-950/80 border border-emerald-500/40 hover:bg-emerald-900/60 text-emerald-300 rounded-xl text-xs font-bold flex items-center gap-2 transition shadow-sm cursor-pointer"
+                        >
+                            <Wallet size={14} className="text-emerald-400" />
+                            <span>Lead Wallet:</span>
+                            <span className="px-1.5 py-0.5 rounded-md bg-emerald-500 text-gray-950 font-black text-[11px]">
+                                {walletCredits !== null ? walletCredits : '...'} Credits
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                fetchQueries();
+                                fetchWallet();
+                            }}
                             disabled={loading}
                             className="px-3.5 py-2 bg-gray-900 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
                         >
@@ -284,37 +359,65 @@ export default function AdminCallQueriesPage() {
                                     </div>
 
                                     {/* Contact & Property Info */}
-                                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-300">
-                                        <a
-                                            href={`tel:${query.customer_phone}`}
-                                            className="text-emerald-400 hover:underline font-bold flex items-center gap-1"
-                                        >
-                                            <Phone size={12} />
-                                            {query.customer_phone}
-                                        </a>
+                                    {(() => {
+                                        const isMasked =
+                                            query.is_contact_masked ||
+                                            query.customer_phone?.includes('*') ||
+                                            query.customer_email?.includes('***');
+                                        const isUnlockingThis = unlockingId === query.id;
 
-                                        {query.customer_email && (
-                                            <a
-                                                href={`mailto:${query.customer_email}`}
-                                                className="text-gray-400 hover:text-white flex items-center gap-1"
-                                            >
-                                                <Mail size={12} />
-                                                {query.customer_email}
-                                            </a>
-                                        )}
+                                        return (
+                                            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-300">
+                                                {isMasked ? (
+                                                    <div className="flex items-center gap-2 bg-amber-950/30 border border-amber-900/40 px-2.5 py-1 rounded-xl">
+                                                        <span className="text-amber-400 font-mono font-bold flex items-center gap-1.5">
+                                                            <Lock size={12} />
+                                                            {query.customer_phone}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            disabled={isUnlockingThis}
+                                                            onClick={() => handleUnlockLead(query.id)}
+                                                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition shadow-sm disabled:opacity-60 cursor-pointer"
+                                                        >
+                                                            <Zap size={11} className="text-amber-300 fill-amber-300" />
+                                                            {isUnlockingThis ? 'Unlocking…' : 'Unlock (1 Credit)'}
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <a
+                                                        href={`tel:${query.customer_phone}`}
+                                                        className="text-emerald-400 hover:underline font-bold flex items-center gap-1"
+                                                    >
+                                                        <Phone size={12} />
+                                                        {query.customer_phone}
+                                                    </a>
+                                                )}
 
-                                        {(query.venture_name || query.plot_number) && (
-                                            <span className="text-gray-400 flex items-center gap-1">
-                                                <Building2 size={12} className="text-blue-400" />
-                                                {query.venture_name || 'Venture'}
-                                                {query.plot_number && ` • Plot #${query.plot_number}`}
-                                            </span>
-                                        )}
+                                                {query.customer_email && (
+                                                    <a
+                                                        href={`mailto:${query.customer_email}`}
+                                                        className="text-gray-400 hover:text-white flex items-center gap-1"
+                                                    >
+                                                        <Mail size={12} />
+                                                        {query.customer_email}
+                                                    </a>
+                                                )}
 
-                                        <span className="text-gray-500 text-[11px]">
-                                            {query.created_at ? new Date(query.created_at).toLocaleString() : ''}
-                                        </span>
-                                    </div>
+                                                {(query.venture_name || query.plot_number) && (
+                                                    <span className="text-gray-400 flex items-center gap-1">
+                                                        <Building2 size={12} className="text-blue-400" />
+                                                        {query.venture_name || 'Venture'}
+                                                        {query.plot_number && ` • Plot #${query.plot_number}`}
+                                                    </span>
+                                                )}
+
+                                                <span className="text-gray-500 text-[11px]">
+                                                    {query.created_at ? new Date(query.created_at).toLocaleString() : ''}
+                                                </span>
+                                            </div>
+                                        );
+                                    })()}
 
                                     {query.message && (
                                         <p className="text-xs text-gray-400 italic bg-gray-950/60 p-2.5 rounded-xl border border-gray-800/80 max-w-2xl">
@@ -427,6 +530,14 @@ export default function AdminCallQueriesPage() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Agent Lead Wallet Modal */}
+            {showWalletModal && (
+                <AgentLeadWalletModal
+                    onClose={() => setShowWalletModal(false)}
+                    onWalletUpdated={(newBal) => setWalletCredits(newBal)}
+                />
             )}
         </div>
     );

@@ -21,6 +21,7 @@ import AdminCallQueriesPage from './pages/admin/AdminCallQueriesPage'
 import AdminBannersPage from './pages/admin/AdminBannersPage'
 import AdminApartmentsPage from './pages/admin/AdminApartmentsPage'
 import AdminApartmentDetailPage from './pages/admin/AdminApartmentDetailPage'
+import AdminRevenueServicesPage from './pages/admin/AdminRevenueServicesPage'
 import CustomerApartmentsPage from './pages/CustomerApartmentsPage'
 import GlobalApiErrorContainer from './components/alter_box/GlobalApiErrorContainer'
 
@@ -56,6 +57,7 @@ function App() {
         <Route path="/admin/approvals" element={<ProtectedRoute><AdminPlotApprovalsPage /></ProtectedRoute>} />
         <Route path="/admin/queries" element={<ProtectedRoute><AdminCallQueriesPage /></ProtectedRoute>} />
         <Route path="/admin/banners" element={<ProtectedRoute><AdminBannersPage /></ProtectedRoute>} />
+        <Route path="/admin/revenue-services" element={<ProtectedRoute><AdminRevenueServicesPage /></ProtectedRoute>} />
 
         {/* Agent Registration & Verification Status */}
         <Route path="/agent-register" element={<AgentRegisterPage />} />

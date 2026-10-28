@@ -7,10 +7,13 @@ import { formatApiErrorMessage } from '../utils/formatApiError'
 import {
     MapPin, Home, ChevronRight, Info, Building2, Building, ChevronLeft,
     Clock, LogOut, Search, Bell, Sparkles, TrendingUp,
-    ShieldCheck, ArrowUpRight, Compass
+    ShieldCheck, ArrowUpRight, Compass, Lock, Eye, Award, CheckCircle2, Navigation, Layers
 } from 'lucide-react'
 import logo from "../assets/logomain.png";
 import HeroAdBanner from '../components/HeroAdBanner';
+import SponsoredVenturesGrid from '../components/revenue/SponsoredVenturesGrid';
+import SecondaryPromoBanner from '../components/revenue/SecondaryPromoBanner';
+import VentureProximityManagerModal from '../components/revenue/VentureProximityManagerModal';
 
 interface Venture {
     id: string
@@ -24,6 +27,9 @@ interface Venture {
     available_plots: number
     status: string
     amenities: string[]
+    posted_by?: 'BUILDER' | 'AGENT'
+    has_lifetime_verification?: boolean
+    creator_name?: string
 }
 
 const NAV = [
@@ -101,17 +107,38 @@ export default function VentureSelect() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [query, setQuery] = useState('')
+    const [smartFilter, setSmartFilter] = useState<'ALL' | 'BUILDER' | 'AGENT' | 'RECENT' | 'TOP'>('ALL')
+    const [privacyConcealed, setPrivacyConcealed] = useState<boolean>(false)
+    const [togglingPrivacy, setTogglingPrivacy] = useState<boolean>(false)
+    const [selectedProximityVenture, setSelectedProximityVenture] = useState<Venture | null>(null)
     const navigate = useNavigate()
 
-    async function fetchVentures() {
+    async function fetchVentures(activeFilter = smartFilter) {
         setLoading(true)
         setError('')
         try {
-            const data = await apiFetch(ENDPOINTS.ventures)
-            await new Promise(r => setTimeout(r, 400))
+            let endpoint = ENDPOINTS.ventures
+            if (activeFilter === 'BUILDER') {
+                endpoint = ENDPOINTS.advancedVentureSearch('posted_by=BUILDER')
+            } else if (activeFilter === 'AGENT') {
+                endpoint = ENDPOINTS.advancedVentureSearch('posted_by=AGENT')
+            } else if (activeFilter === 'RECENT') {
+                endpoint = ENDPOINTS.advancedVentureSearch('recent=true')
+            } else if (activeFilter === 'TOP') {
+                endpoint = ENDPOINTS.advancedVentureSearch('top_performing=true')
+            }
+
+            const data = await apiFetch(endpoint)
+            await new Promise(r => setTimeout(r, 200))
             setVentures(data.results ?? data)
         } catch (err: any) {
-            setError(formatApiErrorMessage(err) || 'Failed to load ventures.')
+            // Gracefully fallback to basic ventures if advanced search service is turned off
+            try {
+                const fallback = await apiFetch(ENDPOINTS.ventures)
+                setVentures(fallback.results ?? fallback)
+            } catch {
+                setError(formatApiErrorMessage(err) || 'Failed to load ventures.')
+            }
         } finally {
             setLoading(false)
         }
@@ -119,7 +146,31 @@ export default function VentureSelect() {
 
     useEffect(() => {
         fetchVentures()
+
+        // Fetch customer data privacy state
+        apiFetch(ENDPOINTS.customerDataPrivacy, { silent: true })
+            .then(data => {
+                if (data && typeof data.privacy_conceal_profile === 'boolean') {
+                    setPrivacyConcealed(data.privacy_conceal_profile)
+                }
+            })
+            .catch(() => {})
     }, [])
+
+    const handleTogglePrivacy = async () => {
+        setTogglingPrivacy(true)
+        try {
+            const res = await apiFetch(ENDPOINTS.customerDataPrivacy, {
+                method: 'POST',
+                body: JSON.stringify({ privacy_conceal_profile: !privacyConcealed }),
+            })
+            setPrivacyConcealed(res.privacy_conceal_profile)
+        } catch (err: any) {
+            alert(formatApiErrorMessage(err) || 'Failed to toggle data privacy.')
+        } finally {
+            setTogglingPrivacy(false)
+        }
+    }
 
     function handleSelect(venture: Venture) {
         sessionStorage.setItem('customer_venture', JSON.stringify(venture))
@@ -220,6 +271,35 @@ export default function VentureSelect() {
 
                         {/* Right side */}
                         <div className="flex items-center gap-2">
+                            {/* Customer Data Privacy Toggle */}
+                            <button
+                                type="button"
+                                disabled={togglingPrivacy}
+                                onClick={handleTogglePrivacy}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
+                                    privacyConcealed
+                                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40 shadow-sm'
+                                        : 'bg-white/10 text-white/70 border-white/10 hover:text-white'
+                                }`}
+                                title={
+                                    privacyConcealed
+                                        ? 'Buyer Privacy Shield Active: Your phone & email are concealed from sellers until you initiate contact.'
+                                        : 'Buyer Privacy Shield Off: Click to conceal your contact profile from sellers.'
+                                }
+                            >
+                                {privacyConcealed ? (
+                                    <>
+                                        <Lock size={12} className="text-emerald-400" />
+                                        <span className="hidden sm:inline">Privacy Shield ON</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Eye size={12} className="text-white/60" />
+                                        <span className="hidden sm:inline">Privacy Shield OFF</span>
+                                    </>
+                                )}
+                            </button>
+
                             <button
                                 className="hidden sm:flex w-9 h-9 rounded-xl items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
                                 aria-label="Notifications"
@@ -298,8 +378,14 @@ export default function VentureSelect() {
                             </div>
                         )}
 
+                        {/* 3. Advertising: 2x4 Recommended & Sponsored Ventures Display */}
+                        <SponsoredVenturesGrid onSelectVenture={handleSelect} />
+
+                        {/* 3. Advertising: Secondary Mid-Page Promotional Banner */}
+                        <SecondaryPromoBanner />
+
                         {/* Title row + search */}
-                        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
                             <div>
                                 <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-1">
                                     Available Ventures
@@ -318,6 +404,37 @@ export default function VentureSelect() {
                                     className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm bg-white border border-slate-200 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400"
                                 />
                             </div>
+                        </div>
+
+                        {/* 4. Customer Services: Advanced Search & Smart Filtering Chips */}
+                        <div className="flex flex-wrap items-center gap-2 mb-6">
+                            {[
+                                { id: 'ALL', label: 'All Ventures', icon: Building2 },
+                                { id: 'BUILDER', label: '🏢 Direct Builders', icon: Award },
+                                { id: 'AGENT', label: '🤝 Agent Listings', icon: Home },
+                                { id: 'RECENT', label: '⏱️ Recent Uploads', icon: Clock },
+                                { id: 'TOP', label: '🔥 Top Performing', icon: TrendingUp },
+                            ].map(tab => {
+                                const Icon = tab.icon
+                                const isSel = smartFilter === tab.id
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => {
+                                            setSmartFilter(tab.id as any)
+                                            fetchVentures(tab.id as any)
+                                        }}
+                                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer ${
+                                            isSel
+                                                ? 'bg-blue-600 text-white shadow-blue-600/30 ring-2 ring-blue-600/20'
+                                                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                        <Icon size={13} />
+                                        <span>{tab.label}</span>
+                                    </button>
+                                )
+                            })}
                         </div>
 
                         {/* Error */}
@@ -381,6 +498,7 @@ export default function VentureSelect() {
                                         key={venture.id}
                                         venture={venture}
                                         onSelect={() => handleSelect(venture)}
+                                        onViewProximity={() => setSelectedProximityVenture(venture)}
                                         index={idx}
                                     />
                                 ))}
@@ -397,6 +515,16 @@ export default function VentureSelect() {
                         </footer>
                     </div>
                 </main>
+
+                {/* Venture Proximity & Infrastructure Modal (Customer View) */}
+                {selectedProximityVenture && (
+                    <VentureProximityManagerModal
+                        slug={selectedProximityVenture.slug}
+                        ventureName={selectedProximityVenture.name}
+                        canEdit={false}
+                        onClose={() => setSelectedProximityVenture(null)}
+                    />
+                )}
             </div>
 
             {/* Keyframes */}
@@ -426,10 +554,12 @@ export default function VentureSelect() {
 function VentureCard({
     venture,
     onSelect,
+    onViewProximity,
     index,
 }: {
     venture: Venture
     onSelect: () => void
+    onViewProximity: () => void
     index: number
 }) {
     const ref = useRef<HTMLDivElement>(null)
@@ -516,16 +646,32 @@ function VentureCard({
             <div className="p-6">
                 {/* Top row */}
                 <div className="flex items-center justify-between mb-4">
-                    <span
-                        className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: `${statusColor}15`, color: statusColor }}
-                    >
+                    <div className="flex items-center gap-1.5 flex-wrap">
                         <span
-                            className="w-1.5 h-1.5 rounded-full animate-pulse"
-                            style={{ background: statusColor }}
-                        />
-                        {venture.status}
-                    </span>
+                            className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                            style={{ background: `${statusColor}15`, color: statusColor }}
+                        >
+                            <span
+                                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                                style={{ background: statusColor }}
+                            />
+                            {venture.status}
+                        </span>
+
+                        {venture.has_lifetime_verification && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-700 border border-amber-300 shadow-sm">
+                                <ShieldCheck size={12} className="text-amber-500 fill-amber-100" />
+                                Verified Developer
+                            </span>
+                        )}
+
+                        {venture.posted_by && (
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                                {venture.posted_by === 'BUILDER' ? '🏢 Direct Builder' : '🤝 Agent'}
+                            </span>
+                        )}
+                    </div>
+
                     <div className="flex items-center gap-1 text-xs text-slate-500">
                         <Home size={11} />
                         {total} total
@@ -625,6 +771,24 @@ function VentureCard({
                         className="relative transition group-hover/btn:translate-x-0.5"
                     />
                 </button>
+                {/* Card Bottom CTA */}
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100 text-xs">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onViewProximity()
+                        }}
+                        className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-700 font-semibold hover:underline"
+                    >
+                        <Compass size={13} />
+                        Infrastructure & Proximity
+                    </button>
+
+                    <span className="inline-flex items-center gap-1 text-blue-600 font-bold group-hover:translate-x-0.5 transition">
+                        Explore Map <ArrowUpRight size={13} />
+                    </span>
+                </div>
             </div>
         </div>
     )

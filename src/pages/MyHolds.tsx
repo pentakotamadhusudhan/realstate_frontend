@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, ENDPOINTS, API_BASE_URL } from '../lib/api'
 import { logout } from '../lib/auth'
-import { MapPin, Clock, CheckCircle, XCircle, ArrowLeft, Phone, LogOut } from 'lucide-react'
+import { MapPin, Clock, CheckCircle, XCircle, ArrowLeft, Phone, LogOut, CalendarPlus, Sparkles } from 'lucide-react'
 import BoxLoader from '@/components/ui/box-loader'
 import ApiErrorAlert from '../components/alter_box/ApiErrorAlert'
 import { formatApiErrorMessage } from '../utils/formatApiError'
@@ -69,11 +69,13 @@ function HoldCard({
     onCancel,
     cancellingId,
     onCall,
+    onExtend,
 }: {
     hold: Hold
     onCancel: (id: string) => void
     cancellingId: string | null
     onCall: () => void
+    onExtend: (hold: Hold) => void
 }) {
     const isActive = hold.status === 'ACTIVE'
 
@@ -157,12 +159,26 @@ function HoldCard({
                 )}
 
                 {/* Action buttons */}
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-2.5">
+                    {isActive && (
+                        <button
+                            onClick={() => onExtend(hold)}
+                            className="flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-bold transition hover:opacity-90 flex items-center justify-center gap-1.5 shadow-sm"
+                            style={{
+                                background: 'linear-gradient(135deg, #059669, #10b981)',
+                                color: 'white',
+                                border: 'none',
+                            }}
+                        >
+                            <CalendarPlus size={14} />
+                            Extend Hold (+72h)
+                        </button>
+                    )}
                     {isActive && (
                         <button
                             onClick={() => onCancel(hold.id)}
                             disabled={cancellingId === hold.id}
-                            className="flex-1 py-3 rounded-xl text-sm font-semibold transition hover:opacity-90 disabled:opacity-60"
+                            className="flex-1 min-w-[120px] py-2.5 rounded-xl text-xs font-semibold transition hover:opacity-90 disabled:opacity-60"
                             style={{
                                 background: 'linear-gradient(135deg, #ef4444, #dc2626)',
                                 color: 'white',
@@ -174,7 +190,7 @@ function HoldCard({
                     )}
                     <button
                         onClick={onCall}
-                        className="flex-1 py-3 rounded-xl text-sm font-semibold transition hover:opacity-80"
+                        className="flex-1 min-w-[100px] py-2.5 rounded-xl text-xs font-semibold transition hover:opacity-80"
                         style={{
                             background: 'white',
                             color: '#374151',
@@ -195,6 +211,10 @@ export default function MyHolds() {
     const [error, setError] = useState('')
     const [cancellingId, setCancellingId] = useState<string | null>(null)
     const [showCallDialog, setShowCallDialog] = useState(false)
+    const [extendingHold, setExtendingHold] = useState<Hold | null>(null)
+    const [extendingHours, setExtendingHours] = useState<number>(72)
+    const [isExtending, setIsExtending] = useState<boolean>(false)
+    const [extendMsg, setExtendMsg] = useState<string>('')
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -224,6 +244,33 @@ export default function MyHolds() {
             alert('Failed to cancel hold. Please try again.')
         } finally {
             setCancellingId(null)
+        }
+    }
+
+    async function handleConfirmExtend() {
+        if (!extendingHold) return
+        setIsExtending(true)
+        setError('')
+        try {
+            const res = await apiFetch(ENDPOINTS.extendHold(extendingHold.id), {
+                method: 'POST',
+                body: JSON.stringify({
+                    hours: extendingHours,
+                    fee_paid: 500.0,
+                }),
+            })
+            const newExpiry = res.extension?.new_expiry || res.new_expiry
+            if (newExpiry) {
+                setHolds(prev =>
+                    prev.map(h => (h.id === extendingHold.id ? { ...h, expires_at: newExpiry } : h))
+                )
+            }
+            setExtendMsg(`Plot ${extendingHold.plot_detail?.plot_number} reservation extended by ${extendingHours} hours!`)
+            setExtendingHold(null)
+        } catch (err: any) {
+            setError(formatApiErrorMessage(err) || 'Failed to extend plot hold.')
+        } finally {
+            setIsExtending(false)
         }
     }
 
@@ -365,6 +412,10 @@ export default function MyHolds() {
                                     onCancel={handleCancel}
                                     cancellingId={cancellingId}
                                     onCall={() => setShowCallDialog(true)}
+                                    onExtend={(h) => {
+                                        setExtendingHold(h)
+                                        setExtendMsg('')
+                                    }}
                                 />
                             ))}
                         </div>
@@ -385,6 +436,7 @@ export default function MyHolds() {
                                     onCancel={handleCancel}
                                     cancellingId={cancellingId}
                                     onCall={() => setShowCallDialog(true)}
+                                    onExtend={() => {}}
                                 />
                             ))}
                         </div>
@@ -458,6 +510,81 @@ export default function MyHolds() {
                             Close
                         </button>
                     </div>
+                </div>
+            )}
+
+            {/* Extend Plot Hold Dialog */}
+            {extendingHold && (
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)' }}
+                    onClick={() => setExtendingHold(null)}
+                >
+                    <div
+                        className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-4"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 rounded-2xl bg-emerald-100 text-emerald-700">
+                                <CalendarPlus size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                    Extend Plot Reservation Hold
+                                </h3>
+                                <p className="text-xs text-gray-500">
+                                    Plot #{extendingHold.plot_detail?.plot_number || 'N/A'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                            Extend your reservation lock beyond the default 3-day hold window to secure this prime inventory while finalizing documents or bank loan approvals.
+                        </p>
+
+                        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-2 text-xs">
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Current Expiry:</span>
+                                <span className="font-semibold text-gray-800">
+                                    {new Date(extendingHold.expires_at).toLocaleString()}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Extension Duration:</span>
+                                <span className="font-bold text-emerald-600">+72 Hours (3 Days)</span>
+                            </div>
+                            <div className="flex justify-between pt-2 border-t border-gray-200">
+                                <span className="text-gray-700 font-semibold">Extension Premium Fee:</span>
+                                <span className="font-black text-gray-900">₹500</span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setExtendingHold(null)}
+                                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-xs font-semibold hover:bg-gray-100 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                disabled={isExtending}
+                                onClick={handleConfirmExtend}
+                                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-md shadow-emerald-600/20 disabled:opacity-50"
+                            >
+                                {isExtending ? 'Extending…' : 'Confirm Extension'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Extend Success Banner */}
+            {extendMsg && (
+                <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2">
+                    <CheckCircle size={16} />
+                    <span>{extendMsg}</span>
                 </div>
             )}
 

@@ -14,6 +14,7 @@ import {
     Phone,
     CreditCard,
     Clock,
+    Sliders,
     Image as ImageIcon
 } from 'lucide-react';
 
@@ -35,6 +36,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
     const isMembershipsActive = location.pathname.startsWith('/admin/memberships');
     const isQueriesActive = location.pathname.startsWith('/admin/queries');
     const isBannersActive = location.pathname.startsWith('/admin/banners');
+    const isRevenueActive = location.pathname.startsWith('/admin/revenue-services');
 
     useEffect(() => {
         // Fetch badge counts safely with silent: true
@@ -184,6 +186,21 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                             <ImageIcon size={15} />
                             Ad Banners
                         </button>
+
+                        {/* Super Admin Revenue Governance Switch */}
+                        {isSuperAdmin(user) && (
+                            <button
+                                type="button"
+                                onClick={() => navigate('/admin/revenue-services')}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${isRevenueActive
+                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                                    : 'text-amber-400 hover:text-amber-300 hover:bg-amber-950/40'
+                                    }`}
+                            >
+                                <Sliders size={15} />
+                                Revenue Controls
+                            </button>
+                        )}
                     </nav>
                 </div>
 
@@ -310,6 +327,18 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                     <ImageIcon size={13} />
                     Banners
                 </button>
+
+                {isSuperAdmin(user) && (
+                    <button
+                        type="button"
+                        onClick={() => navigate('/admin/revenue-services')}
+                        className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 whitespace-nowrap ${isRevenueActive ? 'bg-amber-500 text-gray-950' : 'text-amber-400'
+                            }`}
+                    >
+                        <Sliders size={13} />
+                        Revenue
+                    </button>
+                )}
             </div>
         </header>
     );
