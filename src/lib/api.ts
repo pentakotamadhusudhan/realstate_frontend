@@ -37,6 +37,9 @@ export const ENDPOINTS = {
     myActiveMembership: `${API_BASE_URL}/auth/memberships/my/`,
     pendingVentures: `${API_BASE_URL}/ventures/pending-approval/`,
     approveVenture: (slug: string) => `${API_BASE_URL}/ventures/${slug}/approve/`,
+    publishVenture: (slug: string) => `${API_BASE_URL}/ventures/${slug}/publish/`,
+    unpublishVenture: (slug: string) => `${API_BASE_URL}/ventures/${slug}/unpublish/`,
+    ventureDetail: (slug: string) => `${API_BASE_URL}/ventures/${slug}/`,
     callQueries: (params?: string) =>
         `${API_BASE_URL}/call-queries/${params ? `?${params}` : ''}`,
     callQueryDetail: (id: string) => `${API_BASE_URL}/call-queries/${id}/`,
@@ -182,5 +185,64 @@ export async function apiFetch(
             })
         }
         throw networkError
+    }
+}
+
+/**
+ * Update a venture's status from DRAFT to PUBLISHED.
+ * Supports primary POST /ventures/:slug/approve/ and fallbacks to PATCH /ventures/:slug/ or POST /publish/
+ */
+export async function updateVentureToPublic(slug: string): Promise<any> {
+    try {
+        return await apiFetch(ENDPOINTS.approveVenture(slug), {
+            method: 'POST',
+            body: JSON.stringify({ status: 'PUBLISHED' }),
+        });
+    } catch (err: any) {
+        // If approve endpoint returns 404 or 405, fallback to standard DRF PATCH
+        if (err?.status === 404 || err?.status === 405) {
+            try {
+                return await apiFetch(ENDPOINTS.ventureDetail(slug), {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status: 'PUBLISHED' }),
+                });
+            } catch (patchErr: any) {
+                if (patchErr?.status === 404 || patchErr?.status === 405) {
+                    return await apiFetch(ENDPOINTS.publishVenture(slug), {
+                        method: 'POST',
+                        body: JSON.stringify({ status: 'PUBLISHED' }),
+                    });
+                }
+                throw patchErr;
+            }
+        }
+        throw err;
+    }
+}
+
+/**
+ * Revert a venture's status from PUBLISHED back to DRAFT.
+ */
+export async function updateVentureToDraft(slug: string): Promise<any> {
+    try {
+        return await apiFetch(ENDPOINTS.ventureDetail(slug), {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'DRAFT' }),
+        });
+    } catch (err: any) {
+        if (err?.status === 404 || err?.status === 405) {
+            try {
+                return await apiFetch(ENDPOINTS.unpublishVenture(slug), {
+                    method: 'POST',
+                    body: JSON.stringify({ status: 'DRAFT' }),
+                });
+            } catch (postErr: any) {
+                return await apiFetch(`${API_BASE_URL}/ventures/${slug}/draft/`, {
+                    method: 'POST',
+                    body: JSON.stringify({ status: 'DRAFT' }),
+                });
+            }
+        }
+        throw err;
     }
 }

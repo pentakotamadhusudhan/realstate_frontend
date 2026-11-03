@@ -7,7 +7,8 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '@geoman-io/leaflet-geoman-free'
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
-import { apiFetch, ENDPOINTS, API_BASE_URL } from '../../lib/api'
+import { apiFetch, ENDPOINTS, API_BASE_URL, updateVentureToPublic } from '../../lib/api'
+import { formatApiErrorMessage } from '../../utils/formatApiError'
 import { getUserProfile, isAgent, hasActiveMembership } from '../../lib/auth'
 import AgentMembershipModal from '../../components/admin/AgentMembershipModal'
 import {
@@ -21,7 +22,11 @@ import {
     ArrowDown,
     ArrowLeft,
     ArrowRight,
-    Sparkles
+    Sparkles,
+    Globe,
+    CheckCircle2,
+    Clock,
+    RefreshCw
 } from 'lucide-react'
 
 interface PlotForm {
@@ -135,6 +140,28 @@ export default function VenturePlotUpload() {
     const lastOverlayDataRef = useRef<PDFOverlayData | null>(null)
     const mapRef = useRef<L.Map | null>(null)
     const plotsLoadedRef = useRef(false)
+    const [publishingVenture, setPublishingVenture] = useState(false)
+    const [publishSuccessMsg, setPublishSuccessMsg] = useState('')
+
+    async function handlePublishVenture() {
+        if (!slug) return
+        setPublishingVenture(true)
+        setError('')
+        try {
+            await updateVentureToPublic(slug)
+            setVenture((prev: any) => {
+                const updated = prev ? { ...prev, status: 'PUBLISHED' } : prev
+                sessionStorage.setItem('selected_venture', JSON.stringify(updated))
+                return updated
+            })
+            setPublishSuccessMsg('Venture updated to Public successfully! It is now live.')
+            setTimeout(() => setPublishSuccessMsg(''), 5000)
+        } catch (err: any) {
+            setError(formatApiErrorMessage(err) || 'Failed to update venture to public.')
+        } finally {
+            setPublishingVenture(false)
+        }
+    }
 
     useEffect(() => {
         document.body.classList.add('admin-page')
@@ -773,11 +800,24 @@ export default function VenturePlotUpload() {
 
             {/* Header */}
             <div className="bg-gray-900 border-b border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
-                <div>
-                    <h1 className="text-lg font-bold">Plot Editor</h1>
-                    <p className="text-gray-400 text-xs">
-                        {venture.name} — {venture.city}, {venture.state}
-                    </p>
+                <div className="flex items-center gap-3">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-lg font-bold">Plot Editor</h1>
+                            {venture.status === 'PUBLISHED' || venture.status === 'active' ? (
+                                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border bg-emerald-950 text-emerald-300 border-emerald-800 flex items-center gap-1">
+                                    <CheckCircle2 size={11} /> Public / Live
+                                </span>
+                            ) : (
+                                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border bg-amber-950 text-amber-300 border-amber-800 flex items-center gap-1">
+                                    <Clock size={11} /> Draft
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-gray-400 text-xs">
+                            {venture.name} — {venture.city}, {venture.state}
+                        </p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <span className="text-gray-400 text-xs">
@@ -821,10 +861,33 @@ export default function VenturePlotUpload() {
                     <button
                         onClick={handleSubmitAll}
                         disabled={submitting || newPlotsCount === 0}
-                        className="bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:text-gray-500 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition"
+                        className="bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:text-gray-500 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer"
                     >
                         {submitting ? 'Uploading...' : `Submit ${newPlotsCount} New Plots →`}
                     </button>
+
+                    {/* Update Draft to Public Button */}
+                    {venture.status !== 'PUBLISHED' && venture.status !== 'active' && (
+                        <button
+                            type="button"
+                            onClick={handlePublishVenture}
+                            disabled={publishingVenture}
+                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md shadow-emerald-600/20 disabled:opacity-50 transition cursor-pointer"
+                            title="Update this venture draft to public availability"
+                        >
+                            {publishingVenture ? (
+                                <>
+                                    <RefreshCw size={12} className="animate-spin" />
+                                    Publishing...
+                                </>
+                            ) : (
+                                <>
+                                    <Globe size={12} />
+                                    Publish to Public
+                                </>
+                            )}
+                        </button>
+                    )}
 
                     <button
                         onClick={() => navigate('/admin/ventures')}
@@ -834,6 +897,13 @@ export default function VenturePlotUpload() {
                     </button>
                 </div>
             </div>
+
+            {publishSuccessMsg && (
+                <div className="bg-emerald-950/80 border-b border-emerald-800 text-emerald-200 px-6 py-2.5 text-xs shrink-0 flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    <span>{publishSuccessMsg}</span>
+                </div>
+            )}
 
             {error && (
                 <div className="bg-red-900/50 border-b border-red-700 text-red-300 px-6 py-2 text-xs shrink-0">

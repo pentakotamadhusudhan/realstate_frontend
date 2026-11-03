@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiFetch, ENDPOINTS } from '../../lib/api';
+import { apiFetch, ENDPOINTS, updateVentureToPublic, updateVentureToDraft } from '../../lib/api';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import ApiErrorAlert from '../../components/alter_box/ApiErrorAlert';
 import { formatApiErrorMessage } from '../../utils/formatApiError';
@@ -93,9 +93,7 @@ export default function AdminPlotApprovalsPage() {
         setApprovingSlug(venture.slug);
         setError('');
         try {
-            const resp = await apiFetch(ENDPOINTS.approveVenture(venture.slug), {
-                method: 'POST',
-            });
+            await updateVentureToPublic(venture.slug);
 
             setToastMessage({
                 type: 'success',
@@ -108,6 +106,29 @@ export default function AdminPlotApprovalsPage() {
             setPublishedVentures(prev => [{ ...venture, status: 'PUBLISHED' }, ...prev]);
         } catch (err: any) {
             setError(formatApiErrorMessage(err) || `Failed to approve venture "${venture.name}".`);
+        } finally {
+            setApprovingSlug(null);
+        }
+    };
+
+    // Revert Venture to Draft
+    const handleRevertToDraft = async (venture: VentureItem) => {
+        if (!window.confirm(`Are you sure you want to revert "${venture.name}" back to Draft?`)) return;
+        setApprovingSlug(venture.slug);
+        setError('');
+        try {
+            await updateVentureToDraft(venture.slug);
+            setToastMessage({
+                type: 'success',
+                text: `Venture "${venture.name}" has been moved back to Draft.`,
+            });
+            setTimeout(() => setToastMessage(null), 5000);
+
+            // Move from published to pending list
+            setPublishedVentures(prev => prev.filter(v => v.slug !== venture.slug));
+            setPendingVentures(prev => [{ ...venture, status: 'DRAFT' }, ...prev]);
+        } catch (err: any) {
+            setError(formatApiErrorMessage(err) || `Failed to revert venture "${venture.name}" to draft.`);
         } finally {
             setApprovingSlug(null);
         }
@@ -459,9 +480,20 @@ export default function AdminPlotApprovalsPage() {
                                             )}
                                         </button>
                                     ) : (
-                                        <div className="flex items-center gap-1.5 px-3 py-2 bg-emerald-950/40 border border-emerald-800/60 rounded-xl text-emerald-300 text-xs font-medium">
-                                            <CheckCircle2 size={14} />
-                                            Live on Portal
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1.5 px-3 py-2 bg-emerald-950/40 border border-emerald-800/60 rounded-xl text-emerald-300 text-xs font-medium">
+                                                <CheckCircle2 size={14} />
+                                                Live on Portal
+                                            </div>
+                                            <button
+                                                type="button"
+                                                disabled={isApproving}
+                                                onClick={() => handleRevertToDraft(venture)}
+                                                className="px-2.5 py-2 text-xs text-gray-400 hover:text-amber-300 hover:bg-amber-950/30 rounded-xl border border-transparent hover:border-amber-900/40 transition cursor-pointer"
+                                                title="Revert published venture back to draft"
+                                            >
+                                                {isApproving ? <RefreshCw size={12} className="animate-spin" /> : 'Set to Draft'}
+                                            </button>
                                         </div>
                                     )}
                                 </div>

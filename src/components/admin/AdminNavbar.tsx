@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout, getUserProfile, isSuperAdmin, isAdmin, isAgent } from '../../lib/auth';
 import { apiFetch, ENDPOINTS } from '../../lib/api';
+import logo from '../../assets/logomain.png';
 import {
     Building2,
     Building,
@@ -68,8 +69,8 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                         onClick={() => navigate('/admin/ventures')}
                         className="flex items-center gap-3 cursor-pointer group"
                     >
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
-                            <span className="text-white text-lg">🏢</span>
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden ring-2 ring-blue-400/40 group-hover:ring-blue-400 transition shadow-md shadow-blue-500/10">
+                            <img src={logo} alt="Orib" className="w-full h-full object-contain" />
                         </div>
                         <div>
                             <span className="font-bold text-white tracking-tight text-base sm:text-lg block">
