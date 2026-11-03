@@ -47,7 +47,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ loading, onSubmit })
             {/* Brand Header */}
             <div className="brand-meta">
                 <span className="brand-logo-icon">✦</span>
-                <span className="brand-name">HEARTH & KEY</span>
+                <span className="brand-name">ORIB</span>
             </div>
 
             <div className="form-header">

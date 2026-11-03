@@ -43,19 +43,19 @@ const SAMPLE_BANNERS = [
     {
         label: 'Luxury Villa Plots',
         url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-        target: 'https://plotvista.com/ventures',
+        target: 'https://orib.com/ventures',
         type: 'HERO_BANNER'
     },
     {
         label: 'Prime Commercial Gated Community',
         url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
-        target: 'https://plotvista.com/ventures',
+        target: 'https://orib.com/ventures',
         type: 'VENTURE_FEATURED'
     },
     {
         label: 'Festival Plot Discount Promo',
         url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
-        target: 'https://plotvista.com/ventures',
+        target: 'https://orib.com/ventures',
         type: 'POPUP_MODAL'
     }
 ];
@@ -496,7 +496,7 @@ export default function AdminBannersPage() {
                             Ad Banners Manager
                         </h1>
                         <p className="text-sm text-gray-400 mt-1">
-                            Create, schedule, prioritize, and manage promotional ad banners across PlotVista portals.
+                            Create, schedule, prioritize, and manage promotional ad banners across Orib portals.
                         </p>
                     </div>
 
@@ -1140,7 +1140,7 @@ export default function AdminBannersPage() {
                                 </div>
                                 <div>
                                     <h2 className="text-lg font-bold text-white">Create New Ad Banner</h2>
-                                    <p className="text-xs text-gray-400">Add a promotional ad banner to PlotVista</p>
+                                    <p className="text-xs text-gray-400">Add a promotional ad banner to Orib</p>
                                 </div>
                             </div>
                             <button
@@ -1260,7 +1260,7 @@ export default function AdminBannersPage() {
                                     type="url"
                                     value={formData.target_url}
                                     onChange={e => setFormData(prev => ({ ...prev, target_url: e.target.value }))}
-                                    placeholder="https://plotvista.com/ventures or https://wa.me/..."
+                                    placeholder="https://orib.com/ventures or https://wa.me/..."
                                     className="w-full bg-gray-950 border border-gray-800 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-gray-200 focus:outline-none"
                                     required
                                 />
@@ -1635,7 +1635,7 @@ export default function AdminBannersPage() {
                                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                                     <div>
                                         <span className="text-xs uppercase font-extrabold text-blue-400 tracking-wider">
-                                            PlotVista Promotion
+                                            Orib Promotion
                                         </span>
                                         <p className="text-xs text-gray-300 font-mono truncate max-w-sm mt-0.5">
                                             {previewingBanner.target_url}

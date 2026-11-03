@@ -154,7 +154,7 @@ export default function VentureSelect() {
                     setPrivacyConcealed(data.privacy_conceal_profile)
                 }
             })
-            .catch(() => {})
+            .catch(() => { })
     }, [])
 
     const handleTogglePrivacy = async () => {
@@ -235,15 +235,15 @@ export default function VentureSelect() {
                         >
                             <div className="relative">
                                 <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center overflow-hidden ring-2 ring-blue-400/40 group-hover:ring-blue-400 transition">
-                                    <img src={logo} alt="PlotVista" className="w-full h-full object-contain" />
+                                    <img src={logo} alt="Orib" className="w-full h-full object-contain" />
                                 </div>
                                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-[#0f2040] animate-pulse" />
                             </div>
                             <div className="text-left hidden sm:block">
                                 <span className="font-bold text-white text-base leading-none tracking-tight block">
-                                    PlotVista
+                                    Orib
                                 </span>
-                                <span className="text-[11px] text-white/45">Real Estate Ventures</span>
+                                <span className="text-[11px] text-white/45"></span>
                             </div>
                         </button>
 
@@ -276,11 +276,10 @@ export default function VentureSelect() {
                                 type="button"
                                 disabled={togglingPrivacy}
                                 onClick={handleTogglePrivacy}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
-                                    privacyConcealed
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${privacyConcealed
                                         ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40 shadow-sm'
                                         : 'bg-white/10 text-white/70 border-white/10 hover:text-white'
-                                }`}
+                                    }`}
                                 title={
                                     privacyConcealed
                                         ? 'Buyer Privacy Shield Active: Your phone & email are concealed from sellers until you initiate contact.'
@@ -424,11 +423,10 @@ export default function VentureSelect() {
                                             setSmartFilter(tab.id as any)
                                             fetchVentures(tab.id as any)
                                         }}
-                                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer ${
-                                            isSel
+                                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer ${isSel
                                                 ? 'bg-blue-600 text-white shadow-blue-600/30 ring-2 ring-blue-600/20'
                                                 : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                                        }`}
+                                            }`}
                                     >
                                         <Icon size={13} />
                                         <span>{tab.label}</span>
@@ -508,7 +506,7 @@ export default function VentureSelect() {
                         {/* Footer */}
                         <footer className="mt-16 pb-8 text-center">
                             <div className="inline-flex items-center gap-2 text-xs text-slate-400">
-                                <span>© 2026 PlotVista Real Estate</span>
+                                <span>© 2026 Orib Real Estate</span>
                                 <span className="w-1 h-1 rounded-full bg-slate-300" />
                                 <span>All rights reserved</span>
                             </div>

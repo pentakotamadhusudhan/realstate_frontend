@@ -394,7 +394,7 @@ export const specialFeatures: SpecialFeature[] = [
   },
 ];
 
-export const TOWNSHIP_NAME = 'PlotVista Green Township';
+export const TOWNSHIP_NAME = 'Orib Green Township';
 export const TOWNSHIP_CENTER = {
   lat: T - mToLat(1.5 * PD + RD),
   lng: L + mToLng(150),

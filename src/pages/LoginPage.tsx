@@ -130,7 +130,7 @@ export const LoginPage: React.FC = () => {
 
                 <div className="auth-mode-toggle" style={{ marginTop: '1.5rem' }}>
                     <p className="form-footer" style={{ marginTop: '0' }}>
-                        New to Hearth & Key?{' '}
+                        New to Orib?{' '}
                         <a href="/register" className="forgot-link">Create an account</a>
                     </p>
                 </div>

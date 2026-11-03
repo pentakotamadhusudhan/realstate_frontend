@@ -249,7 +249,7 @@ export default function PlotDetailsDrawer() {
     setHoldSuccess(false);
 
     try {
-      await apiFetch('http://10.233.153.102:8000//holds/', {
+      await apiFetch('http://10.233.153.131:8000//holds/', {
         method: 'POST',
         body: JSON.stringify({
           plot_id: plot.id,

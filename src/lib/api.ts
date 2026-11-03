@@ -2,8 +2,8 @@ export const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ||
     (typeof window !== 'undefined' &&
         (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://10.233.153.102:8000/api'
-        : 'http://10.233.153.102:8000/api')
+        ? 'http://10.233.153.131:8000/api'
+        : 'http://10.233.153.131:8000/api')
 
 export const ENDPOINTS = {
     login: `${API_BASE_URL}/auth/login/`,

@@ -75,7 +75,7 @@ export default function Unverifiedagent() {
                 <div className="brand">
                     <span className="brand-icon">⌂</span>
                     <div>
-                        <h2>RealEstate</h2>
+                        <h2>Orib</h2>
                         <small>Find · Buy · Sell</small>
                     </div>
                 </div>

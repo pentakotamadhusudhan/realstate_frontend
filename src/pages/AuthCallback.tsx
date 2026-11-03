@@ -84,7 +84,7 @@ export const AuthCallback: React.FC = () => {
                 >
                     <img
                         src={logo}
-                        alt="PlotVista"
+                        alt="Orib"
                         style={{ width: '48px', height: '48px', objectFit: 'contain' }}
                     />
                 </div>
@@ -138,7 +138,7 @@ export const AuthCallback: React.FC = () => {
                             <BoxLoader color="white" />
                         </div>
                         <h2 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-                            Connecting to PlotVista
+                            Connecting to Orib
                         </h2>
                         <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
                             {statusText}

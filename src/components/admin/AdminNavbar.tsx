@@ -73,7 +73,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                         </div>
                         <div>
                             <span className="font-bold text-white tracking-tight text-base sm:text-lg block">
-                                PlotVista
+                                Orib
                             </span>
                             <span className="text-[10px] uppercase font-bold tracking-wider text-blue-400 bg-blue-950/80 px-1.5 py-0.5 rounded border border-blue-800/60">
                                 {isSuperAdmin(user) ? 'Super Admin' : isAgent(user) ? 'Agent Portal' : 'Admin Panel'}
@@ -225,7 +225,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({ pendingAgentsCount: pr
                                 {user?.full_name || 'Admin'}
                             </div>
                             <div className="text-[11px] text-gray-400 leading-tight">
-                                {user?.email || 'admin@plotvista.com'}
+                                {user?.email || 'admin@orib.com'}
                             </div>
                         </div>
                     </div>

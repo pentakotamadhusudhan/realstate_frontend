@@ -40,7 +40,7 @@ export default function Navbar() {
             className="font-display text-white font-bold tracking-tight text-sm leading-none block"
             style={{ letterSpacing: '-0.02em' }}
           >
-            PlotVista
+            Orib
           </span>
           <span className="text-xs leading-none" style={{ color: 'rgba(255,255,255,0.45)', fontWeight: 400 }}>
             {TOWNSHIP_NAME}

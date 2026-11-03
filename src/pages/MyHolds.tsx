@@ -6,6 +6,7 @@ import { MapPin, Clock, CheckCircle, XCircle, ArrowLeft, Phone, LogOut, Calendar
 import BoxLoader from '@/components/ui/box-loader'
 import ApiErrorAlert from '../components/alter_box/ApiErrorAlert'
 import { formatApiErrorMessage } from '../utils/formatApiError'
+import logo from '../assets/logomain.png'
 
 interface Hold {
     id: string
@@ -307,17 +308,24 @@ export default function MyHolds() {
                     borderBottom: '1px solid rgba(255,255,255,0.08)',
                 }}
             >
-                <div className="flex items-center gap-3">
-                    <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)' }}
-                    >
-                        <MapPin size={18} color="white" strokeWidth={2.5} />
+                <button
+                    type="button"
+                    onClick={() => navigate('/ventures')}
+                    className="group flex items-center gap-3 focus:outline-none cursor-pointer"
+                >
+                    <div className="relative">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden ring-2 ring-blue-400/40 group-hover:ring-blue-400 transition shadow-sm">
+                            <img src={logo} alt="Orib" className="w-full h-full object-contain" />
+                        </div>
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0f2040] animate-pulse" />
                     </div>
-                    <span className="font-bold text-white text-lg" style={{ letterSpacing: '-0.03em' }}>
-                        PlotVista
-                    </span>
-                </div>
+                    <div className="text-left">
+                        <span className="font-bold text-white text-lg leading-none tracking-tight block">
+                            Orib
+                        </span>
+                        <span className="text-[11px] text-white/50 block mt-0.5">Real Estate Holds</span>
+                    </div>
+                </button>
 
                 <div className="flex items-center gap-3">
                     <button

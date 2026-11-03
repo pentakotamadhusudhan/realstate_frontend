@@ -118,7 +118,7 @@ export default function CustomerApartmentsPage() {
                             </div>
                             <div>
                                 <span className="font-bold text-white tracking-tight text-base sm:text-lg block">
-                                    PlotVista
+                                    Orib
                                 </span>
                                 <span className="text-[10px] uppercase font-bold tracking-wider text-blue-400">
                                     Apartments & Flats
