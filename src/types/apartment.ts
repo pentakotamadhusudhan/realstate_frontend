@@ -63,6 +63,7 @@ export interface Flat {
 export interface Apartment {
     id: string;
     name: string;
+    block_name?: string;
     slug: string;
     address: string;
     latitude: number | string | null;

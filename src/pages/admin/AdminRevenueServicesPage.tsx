@@ -331,22 +331,20 @@ export default function AdminRevenueServicesPage() {
                         <div className="flex items-center gap-2 bg-gray-950 p-1.5 rounded-xl border border-gray-800">
                             <button
                                 onClick={() => setActiveTab('SERVICES')}
-                                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
-                                    activeTab === 'SERVICES'
+                                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${activeTab === 'SERVICES'
                                         ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                                         : 'text-gray-400 hover:text-white hover:bg-gray-900'
-                                }`}
+                                    }`}
                             >
                                 <Sliders size={14} />
                                 Master Services ({stats.total})
                             </button>
                             <button
                                 onClick={() => setActiveTab('VERIFICATIONS')}
-                                className={`relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
-                                    activeTab === 'VERIFICATIONS'
+                                className={`relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${activeTab === 'VERIFICATIONS'
                                         ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                                         : 'text-gray-400 hover:text-white hover:bg-gray-900'
-                                }`}
+                                    }`}
                             >
                                 <ShieldCheck size={14} />
                                 Builder Verifications
@@ -356,11 +354,10 @@ export default function AdminRevenueServicesPage() {
                             </button>
                             <button
                                 onClick={() => setActiveTab('LEAD_PACKAGES')}
-                                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
-                                    activeTab === 'LEAD_PACKAGES'
+                                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${activeTab === 'LEAD_PACKAGES'
                                         ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                                         : 'text-gray-400 hover:text-white hover:bg-gray-900'
-                                }`}
+                                    }`}
                             >
                                 <DollarSign size={14} />
                                 Lead Packages ({packages.length})
@@ -427,11 +424,10 @@ export default function AdminRevenueServicesPage() {
                             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
                                 <button
                                     onClick={() => setCategoryFilter('ALL')}
-                                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 ${
-                                        categoryFilter === 'ALL'
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 ${categoryFilter === 'ALL'
                                             ? 'bg-white text-gray-950 shadow'
                                             : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                                    }`}
+                                        }`}
                                 >
                                     All Categories
                                 </button>
@@ -443,11 +439,10 @@ export default function AdminRevenueServicesPage() {
                                         <button
                                             key={cat}
                                             onClick={() => setCategoryFilter(cat)}
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 ${
-                                                isSel
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 ${isSel
                                                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                                                     : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                                            }`}
+                                                }`}
                                         >
                                             <Icon size={13} />
                                             {meta.label}
@@ -491,11 +486,10 @@ export default function AdminRevenueServicesPage() {
                                     return (
                                         <div
                                             key={service.id}
-                                            className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between ${
-                                                service.is_enabled
+                                            className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between ${service.is_enabled
                                                     ? 'bg-gray-900/90 border-gray-800 hover:border-gray-700 shadow-lg'
                                                     : 'bg-gray-950/70 border-gray-900 opacity-75'
-                                            }`}
+                                                }`}
                                         >
                                             {/* Card Top */}
                                             <div className="p-5">
@@ -527,24 +521,21 @@ export default function AdminRevenueServicesPage() {
                                                     {/* Toggle Switch */}
                                                     <div className="flex items-center gap-2 shrink-0">
                                                         <span
-                                                            className={`text-[11px] font-bold ${
-                                                                service.is_enabled ? 'text-emerald-400' : 'text-gray-500'
-                                                            }`}
+                                                            className={`text-[11px] font-bold ${service.is_enabled ? 'text-emerald-400' : 'text-gray-500'
+                                                                }`}
                                                         >
                                                             {service.is_enabled ? 'ENABLED' : 'DISABLED'}
                                                         </span>
                                                         <button
                                                             disabled={isUpdating}
                                                             onClick={() => handleToggleService(service)}
-                                                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                                                service.is_enabled ? 'bg-emerald-500' : 'bg-gray-800'
-                                                            } ${isUpdating ? 'opacity-50 cursor-wait' : ''}`}
+                                                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${service.is_enabled ? 'bg-emerald-500' : 'bg-gray-800'
+                                                                } ${isUpdating ? 'opacity-50 cursor-wait' : ''}`}
                                                             title={`Toggle ${service.name}`}
                                                         >
                                                             <span
-                                                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                                    service.is_enabled ? 'translate-x-5' : 'translate-x-0'
-                                                                }`}
+                                                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${service.is_enabled ? 'translate-x-5' : 'translate-x-0'
+                                                                    }`}
                                                             />
                                                         </button>
                                                     </div>
@@ -606,11 +597,10 @@ export default function AdminRevenueServicesPage() {
                                     <button
                                         key={st}
                                         onClick={() => setVerificationFilter(st)}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                                            verificationFilter === st
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${verificationFilter === st
                                                 ? 'bg-blue-600 text-white'
                                                 : 'text-gray-400 hover:text-white'
-                                        }`}
+                                            }`}
                                     >
                                         {st}
                                     </button>
@@ -640,13 +630,12 @@ export default function AdminRevenueServicesPage() {
                                                 <div className="flex items-center gap-3">
                                                     <h3 className="text-base font-bold text-white">{item.company_name}</h3>
                                                     <span
-                                                        className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
-                                                            item.status === 'APPROVED'
+                                                        className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${item.status === 'APPROVED'
                                                                 ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800'
                                                                 : item.status === 'PENDING'
-                                                                ? 'bg-amber-950/80 text-amber-400 border-amber-800'
-                                                                : 'bg-red-950/80 text-red-400 border-red-800'
-                                                        }`}
+                                                                    ? 'bg-amber-950/80 text-amber-400 border-amber-800'
+                                                                    : 'bg-red-950/80 text-red-400 border-red-800'
+                                                            }`}
                                                     >
                                                         {item.status}
                                                     </span>
@@ -881,11 +870,10 @@ export default function AdminRevenueServicesPage() {
                                     type="button"
                                     disabled={submittingReview}
                                     onClick={handleSubmitReview}
-                                    className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition shadow-md ${
-                                        reviewStatus === 'APPROVED'
+                                    className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition shadow-md ${reviewStatus === 'APPROVED'
                                             ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20'
                                             : 'bg-red-600 hover:bg-red-500 shadow-red-600/20'
-                                    }`}
+                                        }`}
                                 >
                                     {submittingReview ? 'Submitting…' : `Confirm ${reviewStatus}`}
                                 </button>

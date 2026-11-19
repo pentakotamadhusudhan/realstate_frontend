@@ -16,6 +16,8 @@ import {
     ChevronRight,
     X,
     Eye,
+    Box,
+    Layers,
 } from 'lucide-react';
 import type { Apartment, Flat, FlatFacing, FlatType } from '../types/apartment';
 import { apiFetch, ENDPOINTS } from '../lib/api';
@@ -29,6 +31,7 @@ import {
 } from '../utils/apartmentHelpers';
 import LoadingScreen from '../components/LoadingComponent';
 import ApiErrorAlert from '../components/alter_box/ApiErrorAlert';
+import Apartment3DModel from '../components/apartments/Apartment3DModel';
 
 export default function CustomerApartmentsPage() {
     const navigate = useNavigate();
@@ -43,10 +46,31 @@ export default function CustomerApartmentsPage() {
     const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
     const [selectedFlat, setSelectedFlat] = useState<Flat | null>(null);
 
-    // Selected apartment's flats
+    // Inline 3D Building Explorer block states
+    const [activeAptFor3D, setActiveAptFor3D] = useState<Apartment | null>(null);
+    const [activeAptFlats, setActiveAptFlats] = useState<Flat[]>([]);
+    const [loading3DFlats, setLoading3DFlats] = useState<boolean>(false);
+
+    // Modal flats state
     const [flats, setFlats] = useState<Flat[]>([]);
     const [flatsLoading, setFlatsLoading] = useState(false);
     const [bhkFilter, setBhkFilter] = useState<string>('ALL');
+    const [modalViewMode, setModalViewMode] = useState<'grid' | '3d'>('grid');
+
+    async function load3DModelForApartment(apt: Apartment) {
+        setActiveAptFor3D(apt);
+        setLoading3DFlats(true);
+        try {
+            const data = await apiFetch(ENDPOINTS.apartmentFlats(apt.id));
+            const list = Array.isArray(data) ? data : data?.results || [];
+            setActiveAptFlats(list);
+        } catch (err) {
+            console.error('Failed to load flats for 3D model:', err);
+            setActiveAptFlats([]);
+        } finally {
+            setLoading3DFlats(false);
+        }
+    }
 
     async function loadApartments() {
         setLoading(true);
@@ -55,7 +79,11 @@ export default function CustomerApartmentsPage() {
             const data = await apiFetch(ENDPOINTS.apartments());
             const list = Array.isArray(data) ? data : data?.results || [];
             // Public/customers see active apartments
-            setApartments(list.filter((a: Apartment) => a.is_active));
+            const activeList = list.filter((a: Apartment) => a.is_active);
+            setApartments(activeList);
+            if (activeList.length > 0 && !activeAptFor3D) {
+                load3DModelForApartment(activeList[0]);
+            }
         } catch (err: any) {
             console.error('Failed to load apartments:', err);
             setError(err.message || 'Failed to load apartments.');
@@ -229,74 +257,169 @@ export default function CustomerApartmentsPage() {
                     </div>
                 )}
 
+                {/* 3D Complex Architecture Explorer Section */}
+                {!loading && activeAptFor3D && (
+                    <section id="apartment-3d-explorer" className="space-y-4 pt-2">
+                        <div className="flex flex-wrap items-end justify-between gap-4">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="p-1.5 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                                        <Box size={18} />
+                                    </span>
+                                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                                        3D Complex Architecture Explorer
+                                    </h2>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    Interactive 3D rectangular block model. Rotate 360°, zoom, explode floor levels, and inspect live unit availability.
+                                </p>
+                            </div>
+
+                            {/* Quick Switcher if multiple apartments */}
+                            {filteredApartments.length > 1 && (
+                                <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1">
+                                    <span className="text-xs text-gray-400 shrink-0 font-medium">Select Complex:</span>
+                                    {filteredApartments.map((apt) => (
+                                        <button
+                                            key={apt.id}
+                                            type="button"
+                                            onClick={() => load3DModelForApartment(apt)}
+                                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition shrink-0 cursor-pointer ${
+                                                activeAptFor3D.id === apt.id
+                                                    ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/30'
+                                                    : 'bg-gray-900 border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800'
+                                            }`}
+                                        >
+                                            {apt.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 3D Model Component Container */}
+                        <div className="relative">
+                            {loading3DFlats && (
+                                <div className="absolute inset-0 z-30 bg-gray-950/60 backdrop-blur-xs flex items-center justify-center rounded-3xl">
+                                    <LoadingScreen />
+                                </div>
+                            )}
+                            <Apartment3DModel
+                                apartment={activeAptFor3D}
+                                flats={activeAptFlats}
+                                onSelectFlat={(flat) => {
+                                    setSelectedFlat(flat);
+                                }}
+                            />
+                        </div>
+                    </section>
+                )}
+
                 {/* Apartments Grid */}
                 {!loading && filteredApartments.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredApartments.map((apartment) => {
-                            const total = apartment.total_flats || 0;
-                            const sold = apartment.sold || 0;
-                            const available = Math.max(0, total - sold);
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                                <Building size={18} className="text-blue-400" />
+                                <span>All Apartment Projects ({filteredApartments.length})</span>
+                            </h2>
+                            <span className="text-xs text-gray-400">
+                                Click any card to explore units or view in 3D
+                            </span>
+                        </div>
 
-                            return (
-                                <div
-                                    key={apartment.id}
-                                    onClick={() => handleViewApartment(apartment)}
-                                    className="group bg-gray-900 border border-gray-800 hover:border-blue-500/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 flex flex-col justify-between cursor-pointer"
-                                >
-                                    {/* Cover Image */}
-                                    <div className="relative h-48 bg-gray-950 overflow-hidden">
-                                        {apartment.cover_image ? (
-                                            <img
-                                                src={apartment.cover_image}
-                                                alt={apartment.name}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-gray-950 to-blue-950 text-gray-600 group-hover:text-blue-400 transition-colors">
-                                                <Building size={48} strokeWidth={1.5} />
-                                            </div>
-                                        )}
-                                        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-950/80 text-emerald-400 border border-emerald-800 backdrop-blur-md">
-                                            {available} Units Available
-                                        </div>
-                                    </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredApartments.map((apartment) => {
+                                const total = apartment.total_flats || 0;
+                                const sold = apartment.sold || 0;
+                                const available = Math.max(0, total - sold);
 
-                                    {/* Body */}
-                                    <div className="p-5 flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-start justify-between gap-2 mb-1.5">
-                                                <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors">
-                                                    {apartment.name}
-                                                </h3>
-                                                <ArrowUpRight
-                                                    size={16}
-                                                    className="text-gray-500 group-hover:text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5"
+                                return (
+                                    <div
+                                        key={apartment.id}
+                                        onClick={() => handleViewApartment(apartment)}
+                                        className="group bg-gray-900 border border-gray-800 hover:border-blue-500/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+                                    >
+                                        {/* Cover Image */}
+                                        <div className="relative h-48 bg-gray-950 overflow-hidden">
+                                            {apartment.cover_image ? (
+                                                <img
+                                                    src={apartment.cover_image}
+                                                    alt={apartment.name}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
-                                            </div>
-                                            <p className="text-xs text-gray-400 flex items-center gap-1.5 line-clamp-1 mb-4">
-                                                <MapPin size={13} className="text-blue-400 shrink-0" />
-                                                <span>{apartment.address}</span>
-                                            </p>
-
-                                            {apartment.description && (
-                                                <p className="text-xs text-gray-400 line-clamp-2 mb-4 italic">
-                                                    "{apartment.description}"
-                                                </p>
+                                            ) : (
+                                                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-gray-950 to-blue-950 text-gray-600 group-hover:text-blue-400 transition-colors">
+                                                    <Building size={48} strokeWidth={1.5} />
+                                                </div>
                                             )}
+                                            <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-950/80 text-emerald-400 border border-emerald-800 backdrop-blur-md">
+                                                {available} Units Available
+                                            </div>
                                         </div>
 
-                                        <div className="border-t border-gray-800 pt-3 flex items-center justify-between text-xs">
-                                            <span className="text-gray-400">
-                                                Total Units: <strong className="text-white">{total}</strong>
-                                            </span>
-                                            <span className="text-blue-400 font-semibold flex items-center gap-1 group-hover:underline">
-                                                Explore Units <ChevronRight size={13} />
-                                            </span>
+                                        {/* Body */}
+                                        <div className="p-5 flex-1 flex flex-col justify-between">
+                                            <div>
+                                                <div className="flex items-start justify-between gap-2 mb-1.5">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors">
+                                                            {apartment.name}
+                                                        </h3>
+                                                        {apartment.block_name && (
+                                                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-950/80 text-blue-300 border border-blue-800/80">
+                                                                {apartment.block_name}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <ArrowUpRight
+                                                        size={16}
+                                                        className="text-gray-500 group-hover:text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5"
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-gray-400 flex items-center gap-1.5 line-clamp-1 mb-4">
+                                                    <MapPin size={13} className="text-blue-400 shrink-0" />
+                                                    <span>{apartment.address}</span>
+                                                </p>
+
+                                                {apartment.description && (
+                                                    <p className="text-xs text-gray-400 line-clamp-2 mb-4 italic">
+                                                        "{apartment.description}"
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="border-t border-gray-800 pt-3 flex items-center justify-between text-xs">
+                                                <span className="text-gray-400">
+                                                    Total Units: <strong className="text-white">{total}</strong>
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            load3DModelForApartment(apartment);
+                                                            const el = document.getElementById('apartment-3d-explorer');
+                                                            if (el) {
+                                                                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                            }
+                                                        }}
+                                                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-800/60 hover:bg-cyan-900/60 hover:border-cyan-500/60 transition cursor-pointer"
+                                                        title="Inspect in 3D Block View"
+                                                    >
+                                                        <Box size={13} />
+                                                        <span>3D Model</span>
+                                                    </button>
+                                                    <span className="text-blue-400 font-semibold flex items-center gap-1 group-hover:underline">
+                                                        Explore Units <ChevronRight size={13} />
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
             </main>
@@ -314,16 +437,52 @@ export default function CustomerApartmentsPage() {
                                     {selectedApartment.address}
                                 </p>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setSelectedApartment(null)}
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition"
-                            >
-                                <X size={18} />
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center bg-gray-950 border border-gray-800 rounded-xl p-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setModalViewMode('grid')}
+                                        className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                            modalViewMode === 'grid'
+                                                ? 'bg-blue-600 text-white shadow-sm'
+                                                : 'text-gray-400 hover:text-white'
+                                        }`}
+                                    >
+                                        Grid View
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setModalViewMode('3d')}
+                                        className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                            modalViewMode === '3d'
+                                                ? 'bg-blue-600 text-white shadow-sm'
+                                                : 'text-gray-400 hover:text-white'
+                                        }`}
+                                    >
+                                        <Box size={13} />
+                                        <span>3D Blocks</span>
+                                    </button>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedApartment(null)}
+                                    className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition cursor-pointer"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Modal Body */}
+                        {modalViewMode === '3d' ? (
+                            <div className="p-4 max-h-[80vh] overflow-y-auto">
+                                <Apartment3DModel
+                                    apartment={selectedApartment}
+                                    flats={flats}
+                                    onSelectFlat={(f) => setSelectedFlat(f)}
+                                />
+                            </div>
+                        ) : (
                         <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
                             {/* BHK Filters */}
                             <div className="flex items-center gap-2">
@@ -433,6 +592,7 @@ export default function CustomerApartmentsPage() {
                                 </div>
                             )}
                         </div>
+                        )}
                     </div>
                 </div>
             )}

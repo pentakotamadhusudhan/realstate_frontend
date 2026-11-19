@@ -78,6 +78,7 @@ export default function AdminApartmentsPage() {
         let result = apartments.filter((apt) => {
             const matchesSearch =
                 apt.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                apt.block_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 apt.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 apt.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -450,9 +451,16 @@ export default function AdminApartmentsPage() {
                                     <div className="p-5 flex-1 flex flex-col justify-between">
                                         <div>
                                             <div className="flex items-start justify-between gap-2 mb-1.5">
-                                                <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-1">
-                                                    {apartment.name}
-                                                </h3>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-1">
+                                                        {apartment.name}
+                                                    </h3>
+                                                    {apartment.block_name && (
+                                                        <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-blue-950/80 text-blue-300 border border-blue-800/80">
+                                                            {apartment.block_name}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <ArrowUpRight
                                                     size={16}
                                                     className="text-gray-500 group-hover:text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5"
@@ -548,7 +556,14 @@ export default function AdminApartmentsPage() {
                                                     <div className="w-7 h-7 rounded-lg bg-blue-950/60 border border-blue-900 flex items-center justify-center text-blue-400 shrink-0">
                                                         <Building size={14} />
                                                     </div>
-                                                    <span className="hover:text-blue-400 transition">{apartment.name}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="hover:text-blue-400 transition">{apartment.name}</span>
+                                                        {apartment.block_name && (
+                                                            <span className="text-[10px] font-normal text-blue-400">
+                                                                {apartment.block_name}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                                 <td className="py-3.5 px-4 text-gray-400 max-w-xs truncate">
                                                     {apartment.address}

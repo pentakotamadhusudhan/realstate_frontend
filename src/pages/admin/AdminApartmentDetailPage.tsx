@@ -323,9 +323,16 @@ export default function AdminApartmentDetailPage() {
                         {/* Title and Info Overlay */}
                         <div className="absolute bottom-4 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                             <div>
-                                <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                                    {apartment.name}
-                                </h1>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                        {apartment.name}
+                                    </h1>
+                                    {apartment.block_name && (
+                                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                            {apartment.block_name}
+                                        </span>
+                                    )}
+                                </div>
                                 <p className="text-xs sm:text-sm text-gray-300 flex items-center gap-1.5 mt-1">
                                     <MapPin size={15} className="text-blue-400 shrink-0" />
                                     <span>{apartment.address}</span>

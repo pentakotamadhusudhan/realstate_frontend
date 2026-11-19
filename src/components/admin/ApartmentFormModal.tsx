@@ -20,6 +20,7 @@ export default function ApartmentFormModal({
     const isEditing = Boolean(apartment);
 
     const [name, setName] = useState('');
+    const [blockName, setBlockName] = useState('');
     const [address, setAddress] = useState('');
     const [lat, setLat] = useState<number | null>(null);
     const [lng, setLng] = useState<number | null>(null);
@@ -42,6 +43,7 @@ export default function ApartmentFormModal({
 
         if (apartment) {
             setName(apartment.name || '');
+            setBlockName(apartment.block_name || '');
             setAddress(apartment.address || '');
             setLat(apartment.latitude ? Number(apartment.latitude) : null);
             setLng(apartment.longitude ? Number(apartment.longitude) : null);
@@ -53,6 +55,7 @@ export default function ApartmentFormModal({
             setCoverImagePreview(apartment.cover_image || null);
         } else {
             setName('');
+            setBlockName('');
             setAddress('');
             setLat(17.7212); // Vizag default center
             setLng(83.3150);
@@ -115,6 +118,7 @@ export default function ApartmentFormModal({
             if (coverImageFile) {
                 const formData = new FormData();
                 formData.append('name', name.trim());
+                if (blockName.trim()) formData.append('block_name', blockName.trim());
                 formData.append('address', address.trim());
                 if (lat !== null) formData.append('latitude', lat.toString());
                 if (lng !== null) formData.append('longitude', lng.toString());
@@ -136,6 +140,7 @@ export default function ApartmentFormModal({
                 // Standard JSON payload
                 const payload: any = {
                     name: name.trim(),
+                    block_name: blockName.trim() || undefined,
                     address: address.trim(),
                     latitude: lat !== null ? lat : null,
                     longitude: lng !== null ? lng : null,
@@ -203,19 +208,34 @@ export default function ApartmentFormModal({
                         </div>
                     )}
 
-                    {/* Name */}
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                            Apartment Name <span className="text-rose-400">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="e.g. Skyline Towers, Ocean Pearl Residency"
-                            required
-                            className="w-full px-3.5 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-                        />
+                    {/* Name & Block Name */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                                Apartment Name <span className="text-rose-400">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="e.g. Skyline Towers, Ocean Pearl"
+                                required
+                                className="w-full px-3.5 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                                Block Name <span className="text-gray-500 text-[11px] font-normal">(Optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={blockName}
+                                onChange={(e) => setBlockName(e.target.value)}
+                                placeholder="e.g. Block A, Tower 1, Wing B"
+                                className="w-full px-3.5 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                            />
+                        </div>
                     </div>
 
                     {/* Address */}
